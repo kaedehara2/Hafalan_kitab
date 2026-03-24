@@ -1,21 +1,4 @@
-<<<<<<< HEAD
-# hafalan_kitab
+#Test Commit
 
-Aplikasi manajemen setoran hafalan kitab santri
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-=======
-# Hafalan_kitab_mobile
-Untuk Skripsi 
->>>>>>> 1b3e908c6ffd5bbdc6012ce3abdacdd0a5c0fb63
+list progres dan kesalahan program aplikasi : 
+- untuk saat ini ada sekitar 5 warnings dan ada juga 18 infos daripada sistem mobile aplikasi hafalan kitab, adapun ;etak daripada warnings terdapat pada 3 file didalam folder lib bukan folder didalam folder lib, diantaranya main.dart 3, login.dart 1, dan daftarakun.dart 1
