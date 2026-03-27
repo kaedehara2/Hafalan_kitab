@@ -78,21 +78,32 @@ class _AwamilPageState extends State<AwamilPage> {
     });
   }
 
-  // ================= HITUNG PROGRESS =================
+  // ================= HITUNG PROGRESS (FIX) =================
   Future<double> getProgress(int santriId) async {
     final data = await supabase
         .from('hafalan_santri')
-        .select('id')
+        .select('bagian_awal, bagian_akhir')
         .eq('santri_id', santriId)
         .eq('kitab', 'awamil');
 
-    int jumlah = data.length;
+    double totalProgress = 0;
 
-    double progress = jumlah * 3;
+    for (var item in data) {
+      final awal = item['bagian_awal'];
+      final akhir = item['bagian_akhir'];
 
-    if (progress > 100) progress = 100;
+      int start = babList.indexOf(awal);
+      int end = babList.indexOf(akhir);
 
-    return progress;
+      if (start != -1 && end != -1 && end >= start) {
+        int jumlahBagian = (end - start) + 1;
+        totalProgress += jumlahBagian * 3;
+      }
+    }
+
+    if (totalProgress > 100) totalProgress = 100;
+
+    return totalProgress;
   }
 
   // ================= INSERT BLOK HAFALAN =================
@@ -380,4 +391,3 @@ class _AwamilPageState extends State<AwamilPage> {
     );
   }
 }
-
