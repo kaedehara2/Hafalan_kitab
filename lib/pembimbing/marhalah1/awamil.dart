@@ -52,7 +52,7 @@ class _AwamilPageState extends State<AwamilPage> {
   Future<void> fetchSantri() async {
     final data = await supabase
         .from('santri')
-        .select('id, nama_lengkap, kelas, progress_awamil')
+        .select('id, nama_lengkap, kelas')
         .order('nama_lengkap');
 
     setState(() {
@@ -89,12 +89,15 @@ class _AwamilPageState extends State<AwamilPage> {
     double totalProgress = 0;
 
     for (var item in data) {
-      int start = babList.indexOf(item['bagian_awal']);
-      int end = babList.indexOf(item['bagian_akhir']);
+      final awal = item['bagian_awal'];
+      final akhir = item['bagian_akhir'];
+
+      int start = babList.indexOf(awal);
+      int end = babList.indexOf(akhir);
 
       if (start != -1 && end != -1 && end >= start) {
-        int jumlah = (end - start) + 1;
-        totalProgress += jumlah * 3;
+        int jumlahBagian = (end - start) + 1;
+        totalProgress += jumlahBagian * 3;
       }
     }
 
@@ -103,8 +106,8 @@ class _AwamilPageState extends State<AwamilPage> {
     return totalProgress;
   }
 
-  // ================= UPDATE PROGRESS =================
-  Future<void> updateProgress(int santriId) async {
+  // ================= UPDATE PROGRESS KE DATABASE =================
+  Future<void> updateProgressSantri(int santriId) async {
     double progress = await getProgress(santriId);
 
     await supabase
@@ -113,7 +116,7 @@ class _AwamilPageState extends State<AwamilPage> {
         .eq('id', santriId);
   }
 
-  // ================= INSERT =================
+  // ================= INSERT HAFALAN =================
   Future<void> insertHafalan(int santriId) async {
     if (penilaian == null) return;
 
@@ -132,9 +135,10 @@ class _AwamilPageState extends State<AwamilPage> {
       'status': penilaian,
     });
 
-    await updateProgress(santriId);
+    // 🔥 update progress ke tabel santri
+    await updateProgressSantri(santriId);
+
     await fetchRiwayat(santriId);
-    await fetchSantri();
 
     setState(() {
       startIndex = 0;
@@ -143,16 +147,19 @@ class _AwamilPageState extends State<AwamilPage> {
     });
   }
 
-  // ================= DELETE =================
+  // ================= DELETE HAFALAN =================
   Future<void> deleteHafalan({
     required int hafalanId,
     required int santriId,
   }) async {
     await supabase.from('hafalan_santri').delete().eq('id', hafalanId);
 
-    await updateProgress(santriId);
+    // 🔥 update ulang progress
+    await updateProgressSantri(santriId);
+
     await fetchRiwayat(santriId);
-    await fetchSantri();
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Catatan hafalan berhasil dihapus")),
@@ -186,7 +193,7 @@ class _AwamilPageState extends State<AwamilPage> {
     );
   }
 
-  // ================= CARD SANTRI =================
+  // ================= LIST SANTRI =================
   Widget buildListSantri() {
     return Padding(
       padding: const EdgeInsets.all(12),
@@ -194,90 +201,73 @@ class _AwamilPageState extends State<AwamilPage> {
         itemCount: santriList.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 2.2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
+          childAspectRatio: 2.6,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
         ),
         itemBuilder: (context, i) {
           final santri = santriList[i];
-          double progress = (santri['progress_awamil'] ?? 0).toDouble();
 
-          return InkWell(
-            onTap: () {
-              setState(() => selectedSantri = santri);
-              fetchRiwayat(santri['id']);
-            },
-            child: Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 6,
-                    offset: const Offset(2, 3),
-                  )
-                ],
-                color: Colors.white,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+          return FutureBuilder(
+            future: getProgress(santri['id']),
+            builder: (context, snapshot) {
+              double progress = snapshot.data ?? 0;
+
+              return InkWell(
+                onTap: () {
+                  setState(() => selectedSantri = santri);
+                  fetchRiwayat(santri['id']);
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(width: 2),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.lime[300],
-                        child: Text(
-                          santri['nama_lengkap'][0],
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                      Text(
+                        "${santri['nama_lengkap']} | ${santri['kelas']}",
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          santri['nama_lengkap'],
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
+                      const SizedBox(height: 14),
+                      const Text("Progres"),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: LinearProgressIndicator(
+                                value: progress / 100,
+                                minHeight: 8,
+                                backgroundColor: Colors.grey[300],
+                                valueColor:
+                                    const AlwaysStoppedAnimation<Color>(
+                                        Colors.green),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text("${progress.toInt()}%"),
+                        ],
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    santri['kelas'],
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  const Spacer(),
-                  const Text("Progress"),
-                  const SizedBox(height: 4),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: progress / 100,
-                      minHeight: 8,
-                      backgroundColor: Colors.grey[300],
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.green),
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text("${progress.toInt()}%"),
-                  )
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           );
         },
       ),
     );
   }
 
-  // ================= HALAMAN CATAT =================
+  // ================= CATAT HAFALAN =================
   Widget buildCatatanHafalan() {
     final santriId = selectedSantri!['id'];
 
@@ -290,6 +280,7 @@ class _AwamilPageState extends State<AwamilPage> {
             selectedSantri!['nama_lengkap'],
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
+
           const SizedBox(height: 16),
 
           Text("Dari: ${babList[startIndex.toInt()]}"),
@@ -331,44 +322,86 @@ class _AwamilPageState extends State<AwamilPage> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed:
-                  penilaian == null ? null : () => insertHafalan(santriId),
+              onPressed: penilaian == null
+                  ? null
+                  : () => insertHafalan(santriId),
               child: const Text("Simpan Hafalan"),
             ),
           ),
 
           const SizedBox(height: 24),
-          const Text("Riwayat Hafalan",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          const Text(
+            "Riwayat Hafalan",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
 
           loadingRiwayat
-              ? const Center(child: CircularProgressIndicator())
+              ? const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(),
+                )
               : riwayatHafalan.isEmpty
                   ? const Text("Belum ada catatan")
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: riwayatHafalan.length,
-                      itemBuilder: (context, i) {
-                        final item = riwayatHafalan[i];
-                        final tgl = DateTime.parse(item['tanggal']);
+                  : SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                        columns: const [
+                          DataColumn(label: Text("No")),
+                          DataColumn(label: Text("Tanggal")),
+                          DataColumn(label: Text("Hafalan")),
+                          DataColumn(label: Text("Status")),
+                          DataColumn(label: Text("Aksi")),
+                        ],
+                        rows: List.generate(riwayatHafalan.length, (i) {
+                          final item = riwayatHafalan[i];
+                          final tgl = DateTime.parse(item['tanggal']);
 
-                        return Card(
-                          child: ListTile(
-                            title: Text(item['bagian']),
-                            subtitle: Text(
-                                "${tgl.day}/${tgl.month}/${tgl.year} - ${item['status']}"),
-                            trailing: IconButton(
-                              icon:
-                                  const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => deleteHafalan(
-                                hafalanId: item['id'],
-                                santriId: santriId,
+                          return DataRow(cells: [
+                            DataCell(Text("${i + 1}")),
+                            DataCell(
+                                Text("${tgl.day}/${tgl.month}/${tgl.year}")),
+                            DataCell(Text(item['bagian'])),
+                            DataCell(Text(item['status'])),
+                            DataCell(
+                              IconButton(
+                                icon: const Icon(Icons.delete,
+                                    color: Colors.red),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      title:
+                                          const Text("Hapus Catatan Hafalan"),
+                                      content: const Text(
+                                          "Yakin ingin menghapus catatan ini?"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: const Text("Batal"),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            deleteHafalan(
+                                              hafalanId: item['id'],
+                                              santriId: santriId,
+                                            );
+                                          },
+                                          child: const Text("Hapus"),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          ]);
+                        }),
+                      ),
                     ),
         ],
       ),
