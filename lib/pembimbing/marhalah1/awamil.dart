@@ -50,10 +50,14 @@ class _AwamilPageState extends State<AwamilPage> {
 
   // ================= FETCH SANTRI =================
   Future<void> fetchSantri() async {
+    setState(() => loading = true);
+
     final data = await supabase
         .from('santri')
         .select('id, nama_lengkap, kelas')
         .order('nama_lengkap');
+
+    if (!mounted) return;
 
     setState(() {
       santriList = List<Map<String, dynamic>>.from(data);
@@ -71,6 +75,8 @@ class _AwamilPageState extends State<AwamilPage> {
         .eq('santri_id', santriId)
         .eq('kitab', 'awamil')
         .order('tanggal', ascending: false);
+
+    if (!mounted) return;
 
     setState(() {
       riwayatHafalan = List<Map<String, dynamic>>.from(data);
@@ -101,19 +107,44 @@ class _AwamilPageState extends State<AwamilPage> {
       }
     }
 
-    if (totalProgress > 100) totalProgress = 100;
+    if (totalProgress > 100) {
+      totalProgress = 100;
+    }
 
     return totalProgress;
   }
 
-  // ================= UPDATE PROGRESS KE DATABASE =================
-  Future<void> updateProgressSantri(int santriId) async {
-    double progress = await getProgress(santriId);
+  // ================= CEK KHATAM =================
+  Future<void> cekDanKirimKhataman(int santriId) async {
+    final progress = await getProgress(santriId);
 
-    await supabase
-        .from('santri')
-        .update({'progress_awamil': progress})
-        .eq('id', santriId);
+    if (progress >= 100) {
+      final cekData = await supabase
+          .from('setoran_khataman')
+          .select()
+          .eq('santri_id', santriId)
+          .eq('kitab', 'awamil');
+
+      // jika belum pernah dikirim
+      if (cekData.isEmpty) {
+        await supabase.from('setoran_khataman').insert({
+          'santri_id': santriId,
+          'kitab': 'awamil',
+          'status': 'pending',
+        });
+
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(
+              "Santri berhasil dikirim ke setoran khataman",
+            ),
+          ),
+        );
+      }
+    }
   }
 
   // ================= INSERT HAFALAN =================
@@ -135,16 +166,25 @@ class _AwamilPageState extends State<AwamilPage> {
       'status': penilaian,
     });
 
-    // 🔥 update progress ke tabel santri
-    await updateProgressSantri(santriId);
-
+    // refresh langsung
     await fetchRiwayat(santriId);
+
+    // cek khatam
+    await cekDanKirimKhataman(santriId);
+
+    if (!mounted) return;
 
     setState(() {
       startIndex = 0;
       endIndex = 0;
       penilaian = null;
     });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Hafalan berhasil disimpan"),
+      ),
+    );
   }
 
   // ================= DELETE HAFALAN =================
@@ -152,17 +192,20 @@ class _AwamilPageState extends State<AwamilPage> {
     required int hafalanId,
     required int santriId,
   }) async {
-    await supabase.from('hafalan_santri').delete().eq('id', hafalanId);
+    await supabase
+        .from('hafalan_santri')
+        .delete()
+        .eq('id', hafalanId);
 
-    // 🔥 update ulang progress
-    await updateProgressSantri(santriId);
-
+    // refresh langsung
     await fetchRiwayat(santriId);
 
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Catatan hafalan berhasil dihapus")),
+      const SnackBar(
+        content: Text("Catatan hafalan berhasil dihapus"),
+      ),
     );
   }
 
@@ -208,19 +251,23 @@ class _AwamilPageState extends State<AwamilPage> {
         itemBuilder: (context, i) {
           final santri = santriList[i];
 
-          return FutureBuilder(
+          return FutureBuilder<double>(
             future: getProgress(santri['id']),
             builder: (context, snapshot) {
               double progress = snapshot.data ?? 0;
 
               return InkWell(
-                onTap: () {
-                  setState(() => selectedSantri = santri);
-                  fetchRiwayat(santri['id']);
+                onTap: () async {
+                  setState(() {
+                    selectedSantri = santri;
+                  });
+
+                  await fetchRiwayat(santri['id']);
                 },
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(width: 2),
                   ),
@@ -230,7 +277,7 @@ class _AwamilPageState extends State<AwamilPage> {
                       Text(
                         "${santri['nama_lengkap']} | ${santri['kelas']}",
                         style: const TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -248,7 +295,8 @@ class _AwamilPageState extends State<AwamilPage> {
                                 backgroundColor: Colors.grey[300],
                                 valueColor:
                                     const AlwaysStoppedAnimation<Color>(
-                                        Colors.green),
+                                  Colors.green,
+                                ),
                               ),
                             ),
                           ),
@@ -278,13 +326,21 @@ class _AwamilPageState extends State<AwamilPage> {
         children: [
           Text(
             selectedSantri!['nama_lengkap'],
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          Text("Dari: ${babList[startIndex.toInt()]}"),
+          Text(
+            "Dari: ${babList[startIndex.toInt()]}",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+
           Slider(
+            activeColor: Colors.lime[400],
             value: startIndex,
             min: 0,
             max: (babList.length - 1).toDouble(),
@@ -292,48 +348,104 @@ class _AwamilPageState extends State<AwamilPage> {
             onChanged: (v) {
               setState(() {
                 startIndex = v;
-                if (endIndex < v) endIndex = v;
+
+                if (endIndex < v) {
+                  endIndex = v;
+                }
               });
             },
           ),
 
-          Text("Sampai: ${babList[endIndex.toInt()]}"),
+          const SizedBox(height: 10),
+
+          Text(
+            "Sampai: ${babList[endIndex.toInt()]}",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+
           Slider(
+            activeColor: Colors.lime[400],
             value: endIndex,
             min: startIndex,
             max: (babList.length - 1).toDouble(),
             divisions: babList.length - 1,
-            onChanged: (v) => setState(() => endIndex = v),
+            onChanged: (v) {
+              setState(() {
+                endIndex = v;
+              });
+            },
           ),
 
-          RadioListTile(
-            title: const Text("Lancar"),
-            value: "Lancar",
-            groupValue: penilaian,
-            onChanged: (v) => setState(() => penilaian = v),
-          ),
-          RadioListTile(
-            title: const Text("Kurang Lancar"),
-            value: "Kurang Lancar",
-            groupValue: penilaian,
-            onChanged: (v) => setState(() => penilaian = v),
-          ),
+          const SizedBox(height: 10),
 
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: penilaian == null
-                  ? null
-                  : () => insertHafalan(santriId),
-              child: const Text("Simpan Hafalan"),
+          Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                RadioListTile(
+                  title: const Text("Lancar"),
+                  value: "Lancar",
+                  groupValue: penilaian,
+                  activeColor: Colors.lime[700],
+                  onChanged: (v) {
+                    setState(() {
+                      penilaian = v;
+                    });
+                  },
+                ),
+                RadioListTile(
+                  title: const Text("Kurang Lancar"),
+                  value: "Kurang Lancar",
+                  groupValue: penilaian,
+                  activeColor: Colors.lime[700],
+                  onChanged: (v) {
+                    setState(() {
+                      penilaian = v;
+                    });
+                  },
+                ),
+              ],
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
+
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lime[400],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              onPressed: penilaian == null
+                  ? null
+                  : () => insertHafalan(santriId),
+              child: const Text(
+                "Simpan Hafalan",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 30),
+
           const Text(
             "Riwayat Hafalan",
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
           ),
+
+          const SizedBox(height: 10),
 
           loadingRiwayat
               ? const Padding(
@@ -354,52 +466,73 @@ class _AwamilPageState extends State<AwamilPage> {
                         ],
                         rows: List.generate(riwayatHafalan.length, (i) {
                           final item = riwayatHafalan[i];
-                          final tgl = DateTime.parse(item['tanggal']);
 
-                          return DataRow(cells: [
-                            DataCell(Text("${i + 1}")),
-                            DataCell(
-                                Text("${tgl.day}/${tgl.month}/${tgl.year}")),
-                            DataCell(Text(item['bagian'])),
-                            DataCell(Text(item['status'])),
-                            DataCell(
-                              IconButton(
-                                icon: const Icon(Icons.delete,
-                                    color: Colors.red),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => AlertDialog(
-                                      title:
-                                          const Text("Hapus Catatan Hafalan"),
-                                      content: const Text(
-                                          "Yakin ingin menghapus catatan ini?"),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: const Text("Batal"),
-                                        ),
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.red,
-                                          ),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            deleteHafalan(
-                                              hafalanId: item['id'],
-                                              santriId: santriId,
-                                            );
-                                          },
-                                          child: const Text("Hapus"),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
+                          final tgl =
+                              DateTime.parse(item['tanggal']);
+
+                          return DataRow(
+                            cells: [
+                              DataCell(Text("${i + 1}")),
+
+                              DataCell(
+                                Text(
+                                  "${tgl.day}/${tgl.month}/${tgl.year}",
+                                ),
                               ),
-                            ),
-                          ]);
+
+                              DataCell(
+                                Text(item['bagian']),
+                              ),
+
+                              DataCell(
+                                Text(item['status']),
+                              ),
+
+                              DataCell(
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => AlertDialog(
+                                        title: const Text(
+                                          "Hapus Catatan Hafalan",
+                                        ),
+                                        content: const Text(
+                                          "Yakin ingin menghapus catatan ini?",
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: const Text("Batal"),
+                                          ),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                            ),
+                                            onPressed: () async {
+                                              Navigator.pop(context);
+
+                                              await deleteHafalan(
+                                                hafalanId: item['id'],
+                                                santriId: santriId,
+                                              );
+                                            },
+                                            child: const Text("Hapus"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          );
                         }),
                       ),
                     ),
