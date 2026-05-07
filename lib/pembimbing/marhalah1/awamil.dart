@@ -21,6 +21,7 @@ class _AwamilPageState extends State<AwamilPage> {
 
   double startIndex = 0;
   double endIndex = 0;
+
   String? penilaian;
 
   final List<String> babList = [
@@ -52,98 +53,132 @@ class _AwamilPageState extends State<AwamilPage> {
   Future<void> fetchSantri() async {
     setState(() => loading = true);
 
-    final data = await supabase
-        .from('santri')
-        .select('id, nama_lengkap, kelas')
-        .order('nama_lengkap');
+    try {
+      final data = await supabase
+          .from('santri')
+          .select('id, nama_lengkap, kelas')
+          .order('nama_lengkap');
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      santriList = List<Map<String, dynamic>>.from(data);
-      loading = false;
-    });
+      setState(() {
+        santriList = List<Map<String, dynamic>>.from(data);
+        loading = false;
+      });
+    } catch (e) {
+      setState(() => loading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal mengambil data santri: $e"),
+        ),
+      );
+    }
   }
 
   // ================= FETCH RIWAYAT =================
   Future<void> fetchRiwayat(int santriId) async {
     setState(() => loadingRiwayat = true);
 
-    final data = await supabase
-        .from('hafalan_santri')
-        .select()
-        .eq('santri_id', santriId)
-        .eq('kitab', 'awamil')
-        .order('tanggal', ascending: false);
+    try {
+      final data = await supabase
+          .from('hafalan_santri')
+          .select()
+          .eq('santri_id', santriId)
+          .eq('kitab', 'awamil')
+          .order('tanggal', ascending: false);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      riwayatHafalan = List<Map<String, dynamic>>.from(data);
-      loadingRiwayat = false;
-    });
+      setState(() {
+        riwayatHafalan = List<Map<String, dynamic>>.from(data);
+        loadingRiwayat = false;
+      });
+    } catch (e) {
+      setState(() => loadingRiwayat = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal mengambil riwayat: $e"),
+        ),
+      );
+    }
   }
 
   // ================= HITUNG PROGRESS =================
   Future<double> getProgress(int santriId) async {
-    final data = await supabase
-        .from('hafalan_santri')
-        .select('bagian_awal, bagian_akhir')
-        .eq('santri_id', santriId)
-        .eq('kitab', 'awamil');
-
-    double totalProgress = 0;
-
-    for (var item in data) {
-      final awal = item['bagian_awal'];
-      final akhir = item['bagian_akhir'];
-
-      int start = babList.indexOf(awal);
-      int end = babList.indexOf(akhir);
-
-      if (start != -1 && end != -1 && end >= start) {
-        int jumlahBagian = (end - start) + 1;
-        totalProgress += jumlahBagian * 3;
-      }
-    }
-
-    if (totalProgress > 100) {
-      totalProgress = 100;
-    }
-
-    return totalProgress;
-  }
-
-  // ================= CEK KHATAM =================
-  Future<void> cekDanKirimKhataman(int santriId) async {
-    final progress = await getProgress(santriId);
-
-    if (progress >= 100) {
-      final cekData = await supabase
-          .from('setoran_khataman')
-          .select()
+    try {
+      final data = await supabase
+          .from('hafalan_santri')
+          .select('bagian_awal, bagian_akhir')
           .eq('santri_id', santriId)
           .eq('kitab', 'awamil');
 
-      // jika belum pernah dikirim
-      if (cekData.isEmpty) {
-        await supabase.from('setoran_khataman').insert({
-          'santri_id': santriId,
-          'kitab': 'awamil',
-          'status': 'pending',
-        });
+      double totalProgress = 0;
 
-        if (!mounted) return;
+      for (var item in data) {
+        final awal = item['bagian_awal'];
+        final akhir = item['bagian_akhir'];
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.green,
-            content: Text(
-              "Santri berhasil dikirim ke setoran khataman",
-            ),
-          ),
-        );
+        int start = babList.indexOf(awal);
+        int end = babList.indexOf(akhir);
+
+        if (start != -1 && end != -1 && end >= start) {
+          int jumlahBagian = (end - start) + 1;
+
+          // 16 bagian = 100%
+          totalProgress += jumlahBagian * (100 / babList.length);
+        }
       }
+
+      if (totalProgress > 100) {
+        totalProgress = 100;
+      }
+
+      return totalProgress;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  // ================= CEK KHATAMAN =================
+  Future<void> cekDanKirimKhataman(int santriId) async {
+    try {
+      final progress = await getProgress(santriId);
+
+      debugPrint("PROGRESS SANTRI : $progress");
+
+      if (progress >= 100) {
+        final cekData = await supabase
+            .from('setoran_khataman')
+            .select()
+            .eq('santri_id', santriId)
+            .eq('kitab', 'awamil');
+
+        // jika belum pernah masuk
+        if (cekData.isEmpty) {
+          await supabase.from('setoran_khataman').insert({
+            'santri_id': santriId,
+            'kitab': 'awamil',
+            'status': 'pending',
+          });
+
+          debugPrint("BERHASIL MASUK SETORAN KHATAMAN");
+
+          if (!mounted) return;
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Colors.green,
+              content: Text(
+                "Santri berhasil masuk setoran khataman",
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("ERROR KHATAMAN : $e");
     }
   }
 
@@ -151,40 +186,52 @@ class _AwamilPageState extends State<AwamilPage> {
   Future<void> insertHafalan(int santriId) async {
     if (penilaian == null) return;
 
-    final bagianAwal = babList[startIndex.toInt()];
-    final bagianAkhir = babList[endIndex.toInt()];
+    try {
+      final bagianAwal = babList[startIndex.toInt()];
+      final bagianAkhir = babList[endIndex.toInt()];
 
-    final bagianText =
-        startIndex == endIndex ? bagianAwal : "$bagianAwal - $bagianAkhir";
+      final bagianText = startIndex == endIndex
+          ? bagianAwal
+          : "$bagianAwal - $bagianAkhir";
 
-    await supabase.from('hafalan_santri').insert({
-      'santri_id': santriId,
-      'kitab': 'awamil',
-      'bagian_awal': bagianAwal,
-      'bagian_akhir': bagianAkhir,
-      'bagian': bagianText,
-      'status': penilaian,
-    });
+      await supabase.from('hafalan_santri').insert({
+        'santri_id': santriId,
+        'kitab': 'awamil',
+        'bagian_awal': bagianAwal,
+        'bagian_akhir': bagianAkhir,
+        'bagian': bagianText,
+        'status': penilaian,
+      });
 
-    // refresh langsung
-    await fetchRiwayat(santriId);
+      // refresh riwayat
+      await fetchRiwayat(santriId);
 
-    // cek khatam
-    await cekDanKirimKhataman(santriId);
+      // refresh list santri
+      await fetchSantri();
 
-    if (!mounted) return;
+      // cek khataman
+      await cekDanKirimKhataman(santriId);
 
-    setState(() {
-      startIndex = 0;
-      endIndex = 0;
-      penilaian = null;
-    });
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Hafalan berhasil disimpan"),
-      ),
-    );
+      setState(() {
+        startIndex = 0;
+        endIndex = 0;
+        penilaian = null;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Hafalan berhasil disimpan"),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menyimpan hafalan: $e"),
+        ),
+      );
+    }
   }
 
   // ================= DELETE HAFALAN =================
@@ -192,21 +239,32 @@ class _AwamilPageState extends State<AwamilPage> {
     required int hafalanId,
     required int santriId,
   }) async {
-    await supabase
-        .from('hafalan_santri')
-        .delete()
-        .eq('id', hafalanId);
+    try {
+      await supabase
+          .from('hafalan_santri')
+          .delete()
+          .eq('id', hafalanId);
 
-    // refresh langsung
-    await fetchRiwayat(santriId);
+      // refresh langsung
+      await fetchRiwayat(santriId);
 
-    if (!mounted) return;
+      // refresh list santri
+      await fetchSantri();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Catatan hafalan berhasil dihapus"),
-      ),
-    );
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Catatan hafalan berhasil dihapus"),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Gagal menghapus hafalan: $e"),
+        ),
+      );
+    }
   }
 
   // ================= UI =================
@@ -214,6 +272,10 @@ class _AwamilPageState extends State<AwamilPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.lime[400],
+        title: const Text(
+          "Kitab Awamil - Catat Hafalan",
+        ),
         leading: selectedSantri != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -225,11 +287,11 @@ class _AwamilPageState extends State<AwamilPage> {
                 },
               )
             : null,
-        title: const Text("Kitab Awamil - Catat Hafalan"),
-        backgroundColor: Colors.lime[400],
       ),
       body: loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
           : selectedSantri == null
               ? buildListSantri()
               : buildCatatanHafalan(),
@@ -281,9 +343,13 @@ class _AwamilPageState extends State<AwamilPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+
                       const SizedBox(height: 14),
+
                       const Text("Progres"),
+
                       const SizedBox(height: 6),
+
                       Row(
                         children: [
                           Expanded(
@@ -293,14 +359,12 @@ class _AwamilPageState extends State<AwamilPage> {
                                 value: progress / 100,
                                 minHeight: 8,
                                 backgroundColor: Colors.grey[300],
-                                valueColor:
-                                    const AlwaysStoppedAnimation<Color>(
-                                  Colors.green,
-                                ),
                               ),
                             ),
                           ),
+
                           const SizedBox(width: 10),
+
                           Text("${progress.toInt()}%"),
                         ],
                       ),
@@ -336,7 +400,9 @@ class _AwamilPageState extends State<AwamilPage> {
 
           Text(
             "Dari: ${babList[startIndex.toInt()]}",
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
 
           Slider(
@@ -360,7 +426,9 @@ class _AwamilPageState extends State<AwamilPage> {
 
           Text(
             "Sampai: ${babList[endIndex.toInt()]}",
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
 
           Slider(
@@ -464,76 +532,79 @@ class _AwamilPageState extends State<AwamilPage> {
                           DataColumn(label: Text("Status")),
                           DataColumn(label: Text("Aksi")),
                         ],
-                        rows: List.generate(riwayatHafalan.length, (i) {
-                          final item = riwayatHafalan[i];
+                        rows: List.generate(
+                          riwayatHafalan.length,
+                          (i) {
+                            final item = riwayatHafalan[i];
 
-                          final tgl =
-                              DateTime.parse(item['tanggal']);
+                            final tgl =
+                                DateTime.parse(item['tanggal']);
 
-                          return DataRow(
-                            cells: [
-                              DataCell(Text("${i + 1}")),
+                            return DataRow(
+                              cells: [
+                                DataCell(Text("${i + 1}")),
 
-                              DataCell(
-                                Text(
-                                  "${tgl.day}/${tgl.month}/${tgl.year}",
-                                ),
-                              ),
-
-                              DataCell(
-                                Text(item['bagian']),
-                              ),
-
-                              DataCell(
-                                Text(item['status']),
-                              ),
-
-                              DataCell(
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
+                                DataCell(
+                                  Text(
+                                    "${tgl.day}/${tgl.month}/${tgl.year}",
                                   ),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (_) => AlertDialog(
-                                        title: const Text(
-                                          "Hapus Catatan Hafalan",
-                                        ),
-                                        content: const Text(
-                                          "Yakin ingin menghapus catatan ini?",
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text("Batal"),
-                                          ),
-                                          ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.red,
-                                            ),
-                                            onPressed: () async {
-                                              Navigator.pop(context);
-
-                                              await deleteHafalan(
-                                                hafalanId: item['id'],
-                                                santriId: santriId,
-                                              );
-                                            },
-                                            child: const Text("Hapus"),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
                                 ),
-                              ),
-                            ],
-                          );
-                        }),
+
+                                DataCell(
+                                  Text(item['bagian']),
+                                ),
+
+                                DataCell(
+                                  Text(item['status']),
+                                ),
+
+                                DataCell(
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (_) => AlertDialog(
+                                          title: const Text(
+                                            "Hapus Catatan Hafalan",
+                                          ),
+                                          content: const Text(
+                                            "Yakin ingin menghapus catatan ini?",
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text("Batal"),
+                                            ),
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.red,
+                                              ),
+                                              onPressed: () async {
+                                                Navigator.pop(context);
+
+                                                await deleteHafalan(
+                                                  hafalanId: item['id'],
+                                                  santriId: santriId,
+                                                );
+                                              },
+                                              child: const Text("Hapus"),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                       ),
                     ),
         ],

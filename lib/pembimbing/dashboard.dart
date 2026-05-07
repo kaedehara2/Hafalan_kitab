@@ -45,33 +45,55 @@ class _DashboardPageState extends State<DashboardPage> {
     ];
   }
 
-  // ================= FETCH SETORAN KHATAMAN =================
+  // ================= FETCH SETORAN =================
   Future<void> fetchSetoranKhataman() async {
-    setState(() => loadingKhataman = true);
-
-    final data = await supabase
-        .from('setoran_khataman')
-        .select('''
-          id,
-          kitab,
-          status,
-          tanggal_pengajuan,
-          santri (
-            nama_lengkap,
-            kelas
-          )
-        ''')
-        .order('tanggal_pengajuan', ascending: false);
-
-    if (!mounted) return;
-
     setState(() {
-      dataKhataman = List<Map<String, dynamic>>.from(data);
-      loadingKhataman = false;
+      loadingKhataman = true;
     });
+
+    try {
+      final data = await supabase
+          .from('setoran_khataman')
+          .select('''
+            id,
+            kitab,
+            status,
+            tanggal_pengajuan,
+            tanggal_setoran,
+            santri (
+              nama_lengkap,
+              kelas
+            )
+          ''')
+          .order(
+            'tanggal_pengajuan',
+            ascending: false,
+          );
+
+      if (!mounted) return;
+
+      setState(() {
+        dataKhataman = List<Map<String, dynamic>>.from(data);
+        loadingKhataman = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        loadingKhataman = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Gagal mengambil data khataman: $e",
+          ),
+        ),
+      );
+    }
   }
 
-  // ================= REFRESH PAGE =================
+  // ================= REFRESH =================
   void refreshPages() {
     setState(() {
       _pages = [
@@ -83,61 +105,25 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
-  // ================= APPROVE KHATAMAN =================
-  Future<void> approveKhataman(int id) async {
-    await supabase
-        .from('setoran_khataman')
-        .update({
-          'status': 'disetujui',
-          'tanggal_setoran': DateTime.now().toIso8601String(),
-        })
-        .eq('id', id);
+  // ================= NAVIGATION =================
+  void _onItemTapped(int index) async {
+    setState(() {
+      _selectedIndex = index;
+    });
 
-    await fetchSetoranKhataman();
+    if (index == 0) {
+      await fetchSetoranKhataman();
 
-    refreshPages();
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.green,
-        content: Text("Setoran khataman disetujui"),
-      ),
-    );
-  }
-
-  // ================= TOLAK KHATAMAN =================
-  Future<void> tolakKhataman(int id) async {
-    await supabase
-        .from('setoran_khataman')
-        .update({
-          'status': 'ditolak',
-        })
-        .eq('id', id);
-
-    await fetchSetoranKhataman();
-
-    refreshPages();
-
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.red,
-        content: Text("Setoran khataman ditolak"),
-      ),
-    );
-  }
-
-  // ================= ITEM NAV =================
-  void _onItemTapped(int index) {
-    setState(() => _selectedIndex = index);
+      refreshPages();
+    }
   }
 
   // ================= LOGOUT =================
   void _logout() {
-    Navigator.pushReplacementNamed(context, '/login');
+    Navigator.pushReplacementNamed(
+      context,
+      '/login',
+    );
   }
 
   // ================= TITLE =================
@@ -145,12 +131,16 @@ class _DashboardPageState extends State<DashboardPage> {
     switch (_selectedIndex) {
       case 0:
         return 'Beranda M1';
+
       case 1:
         return 'Catat Hafalan';
+
       case 2:
         return 'Riwayat Hafalan';
+
       case 3:
         return 'Kelola Data Santri';
+
       default:
         return '';
     }
@@ -186,7 +176,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
                 Expanded(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
                       const Text(
                         "Dashboard Pembimbing",
@@ -229,7 +220,8 @@ class _DashboardPageState extends State<DashboardPage> {
               Expanded(
                 child: buildInfoCard(
                   title: "Pending",
-                  value: "${dataKhataman.where((e) => e['status'] == 'pending').length}",
+                  value:
+                      "${dataKhataman.where((e) => e['status'] == 'pending').length}",
                   icon: Icons.access_time,
                 ),
               ),
@@ -240,7 +232,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
           // ================= TITLE =================
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment:
+                MainAxisAlignment.spaceBetween,
             children: [
               const Text(
                 "Setoran Khataman",
@@ -252,14 +245,16 @@ class _DashboardPageState extends State<DashboardPage> {
 
               IconButton(
                 onPressed: showSantriKhatamDialog,
-                icon: const Icon(Icons.add_circle_outline),
+                icon: const Icon(
+                  Icons.add_circle_outline,
+                ),
               ),
             ],
           ),
 
           const SizedBox(height: 10),
 
-          // ================= LIST =================
+          // ================= LOADING =================
           if (loadingKhataman)
             const Center(
               child: Padding(
@@ -267,12 +262,15 @@ class _DashboardPageState extends State<DashboardPage> {
                 child: CircularProgressIndicator(),
               ),
             )
+
+          // ================= EMPTY =================
           else if (dataKhataman.isEmpty)
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius:
+                    BorderRadius.circular(20),
               ),
               child: const Column(
                 children: [
@@ -293,109 +291,74 @@ class _DashboardPageState extends State<DashboardPage> {
                 ],
               ),
             )
+
+          // ================= LIST =================
           else
-            ...List.generate(dataKhataman.length, (i) {
-              final item = dataKhataman[i];
+            ...List.generate(
+              dataKhataman.length,
+              (i) {
+                final item = dataKhataman[i];
 
-              final santri = item['santri'];
+                final santri = item['santri'];
 
-              return Container(
-                margin: const EdgeInsets.only(bottom: 14),
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(22),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.lime[400],
-                          child: const Icon(
-                            Icons.person,
-                            color: Colors.black,
-                          ),
+                return Container(
+                  margin: const EdgeInsets.only(
+                    bottom: 14,
+                  ),
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                        BorderRadius.circular(22),
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor:
+                            Colors.lime[400],
+                        child: const Icon(
+                          Icons.person,
+                          color: Colors.black,
                         ),
-
-                        const SizedBox(width: 14),
-
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                santri['nama_lengkap'],
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-
-                              const SizedBox(height: 4),
-
-                              Text(
-                                "Kitab ${item['kitab']}",
-                              ),
-
-                              Text(
-                                "Kelas ${santri['kelas']}",
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        buildStatusBadge(item['status']),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    if (item['status'] == 'pending')
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.lime[400],
-                              ),
-                              onPressed: () {
-                                approveKhataman(item['id']);
-                              },
-                              child: const Text(
-                                "Approve",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(width: 10),
-
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                              ),
-                              onPressed: () {
-                                tolakKhataman(item['id']);
-                              },
-                              child: const Text(
-                                "Tolak",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
-                  ],
-                ),
-              );
-            }),
+
+                      const SizedBox(width: 14),
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              santri['nama_lengkap'],
+                              style: const TextStyle(
+                                fontWeight:
+                                    FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+
+                            const SizedBox(height: 4),
+
+                            Text(
+                              "Kitab ${item['kitab']}",
+                            ),
+
+                            Text(
+                              "Kelas ${santri['kelas']}",
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      buildStatusBadge(
+                        item['status'],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );
@@ -411,7 +374,8 @@ class _DashboardPageState extends State<DashboardPage> {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius:
+            BorderRadius.circular(20),
       ),
       child: Column(
         children: [
@@ -435,7 +399,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // ================= STATUS BADGE =================
+  // ================= STATUS =================
   Widget buildStatusBadge(String status) {
     Color warna = Colors.orange;
 
@@ -454,7 +418,8 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       decoration: BoxDecoration(
         color: warna.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius:
+            BorderRadius.circular(20),
       ),
       child: Text(
         status.toUpperCase(),
@@ -466,70 +431,93 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // ================= POPUP =================
+  // ================= DIALOG =================
   void showSantriKhatamDialog() async {
-    final data = await supabase
-        .from('setoran_khataman')
-        .select('''
-          id,
-          kitab,
-          status,
-          santri (
-            nama_lengkap,
-            kelas
-          )
-        ''')
-        .eq('status', 'pending');
+    try {
+      final data = await supabase
+          .from('setoran_khataman')
+          .select('''
+            id,
+            kitab,
+            status,
+            santri (
+              nama_lengkap,
+              kelas
+            )
+          ''')
+          .eq('status', 'pending');
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    showDialog(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Text(
-            "Santri Siap Setoran Khataman",
-          ),
-          content: SizedBox(
-            width: double.maxFinite,
-            child: data.isEmpty
-                ? const Text(
-                    "Belum ada santri yang mencapai 100%",
-                  )
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: data.length,
-                    itemBuilder: (context, i) {
-                      final item = data[i];
-                      final santri = item['santri'];
+      showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius:
+                  BorderRadius.circular(20),
+            ),
+            title: const Text(
+              "Santri Siap Setoran Khataman",
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: data.isEmpty
+                  ? const Text(
+                      "Belum ada santri yang mencapai 100%",
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: data.length,
+                      itemBuilder:
+                          (context, i) {
+                        final item = data[i];
 
-                      return Card(
-                        child: ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor: Colors.lime[400],
-                            child: Text("${i + 1}"),
+                        final santri =
+                            item['santri'];
+
+                        return Card(
+                          child: ListTile(
+                            leading:
+                                CircleAvatar(
+                              backgroundColor:
+                                  Colors
+                                      .lime[400],
+                              child: Text(
+                                "${i + 1}",
+                              ),
+                            ),
+                            title: Text(
+                              santri[
+                                  'nama_lengkap'],
+                            ),
+                            subtitle: Text(
+                              "Kitab ${item['kitab']} • ${santri['kelas']}",
+                            ),
+                            trailing:
+                                const Icon(
+                              Icons.check_circle,
+                              color:
+                                  Colors.green,
+                            ),
                           ),
-                          title: Text(
-                            santri['nama_lengkap'],
-                          ),
-                          subtitle: Text(
-                            "Kitab ${item['kitab']} • ${santri['kelas']}",
-                          ),
-                          trailing: const Icon(
-                            Icons.check_circle,
-                            color: Colors.green,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            "Gagal membuka dialog: $e",
           ),
-        );
-      },
-    );
+        ),
+      );
+    }
   }
 
   // ================= UI =================
@@ -549,26 +537,32 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
       ),
 
-      // ================= DRAWER =================
       drawer: Drawer(
-        shape: const RoundedRectangleBorder(
+        shape:
+            const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topRight: Radius.circular(20),
-            bottomRight: Radius.circular(20),
+            bottomRight:
+                Radius.circular(20),
           ),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment:
+              CrossAxisAlignment.stretch,
           children: [
             UserAccountsDrawerHeader(
               decoration: BoxDecoration(
                 color: Colors.lime[400],
               ),
-              accountName: Text(widget.username),
-              accountEmail:
-                  Text('Marhalah: ${widget.marhalah}'),
-              currentAccountPicture: const CircleAvatar(
-                backgroundColor: Colors.white,
+              accountName:
+                  Text(widget.username),
+              accountEmail: Text(
+                'Marhalah: ${widget.marhalah}',
+              ),
+              currentAccountPicture:
+                  const CircleAvatar(
+                backgroundColor:
+                    Colors.white,
                 child: Icon(
                   Icons.person,
                   size: 40,
@@ -578,7 +572,8 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
 
             ListTile(
-              leading: const Icon(Icons.person),
+              leading:
+                  const Icon(Icons.person),
               title: const Text('Profil'),
               onTap: () {
                 Navigator.pop(context);
@@ -586,9 +581,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ProfilPage(
-                      username: widget.username,
-                      marhalah: widget.marhalah,
+                    builder: (_) =>
+                        ProfilPage(
+                      username:
+                          widget.username,
+                      marhalah:
+                          widget.marhalah,
                     ),
                   ),
                 );
@@ -596,11 +594,17 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
 
             ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Pengaturan'),
+              leading:
+                  const Icon(Icons.settings),
+              title:
+                  const Text('Pengaturan'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.pushNamed(context, '/pengaturan');
+
+                Navigator.pushNamed(
+                  context,
+                  '/pengaturan',
+                );
               },
             ),
 
@@ -626,35 +630,43 @@ class _DashboardPageState extends State<DashboardPage> {
       // ================= BODY =================
       body: _pages[_selectedIndex],
 
-      // ================= FLOATING BUTTON =================
-      floatingActionButton: _selectedIndex == 0
-          ? FloatingActionButton(
-              backgroundColor: Colors.lime[400],
-              onPressed: showSantriKhatamDialog,
-              child: const Icon(
-                Icons.add,
-                color: Colors.black,
-              ),
-            )
-          : null,
+      // ================= FLOAT =================
+      floatingActionButton:
+          _selectedIndex == 0
+              ? FloatingActionButton(
+                  backgroundColor:
+                      Colors.lime[400],
+                  onPressed:
+                      showSantriKhatamDialog,
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.black,
+                  ),
+                )
+              : null,
 
       // ================= BOTTOM NAV =================
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: Colors.lime[400],
-          borderRadius: const BorderRadius.only(
+          borderRadius:
+              const BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
           ),
         ),
         child: BottomNavigationBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor:
+              Colors.transparent,
           elevation: 0,
           currentIndex: _selectedIndex,
           onTap: _onItemTapped,
-          selectedItemColor: Colors.black,
-          unselectedItemColor: Colors.black54,
-          type: BottomNavigationBarType.fixed,
+          selectedItemColor:
+              Colors.black,
+          unselectedItemColor:
+              Colors.black54,
+          type:
+              BottomNavigationBarType.fixed,
           items: const [
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
