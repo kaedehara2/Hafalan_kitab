@@ -14,6 +14,8 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
 
   List<Map<String, dynamic>> santriList = [];
 
+  String? userMarhalah;
+
   // ================= CONTROLLER =================
   final TextEditingController namaController = TextEditingController();
   final TextEditingController kelasController = TextEditingController();
@@ -26,13 +28,35 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
   @override
   void initState() {
     super.initState();
-    _fetchSantri();
+    _loadPembimbingDanSantri();
+  }
+
+  // ================= AMBIL DATA PEMBIMBING =================
+  Future<void> _loadPembimbingDanSantri() async {
+    final user = supabase.auth.currentUser;
+
+    if (user == null) return;
+
+    final pembimbing = await supabase
+        .from('pembimbing')
+        .select('marhalah')
+        .eq('email', user.email!)
+        .single();
+
+    userMarhalah = pembimbing['marhalah'];
+
+    await _fetchSantri();
   }
 
   // ================= FETCH =================
   Future<void> _fetchSantri() async {
-    final response =
-        await supabase.from('santri').select().order('id', ascending: true);
+    if (userMarhalah == null) return;
+
+    final response = await supabase
+        .from('santri')
+        .select()
+        .eq('marhalah', userMarhalah!)
+        .order('id', ascending: true);
 
     setState(() {
       santriList = List<Map<String, dynamic>>.from(response);
@@ -62,6 +86,7 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
       'jenjang': jenjang,
       'alamat': alamat,
       'nama_wali': wali,
+      'marhalah': userMarhalah,
     });
 
     _afterSave('Data berhasil ditambahkan');
@@ -127,12 +152,19 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
   // ================= MODAL =================
   void _showAddSantriModal() {
     _clearForm();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape:
-          const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (_) => _buildFormModal('Tambah Data Santri', _addSantri),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (_) => _buildFormModal(
+        'Tambah Data Santri',
+        _addSantri,
+      ),
     );
   }
 
@@ -142,18 +174,28 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
     jenjangController.text = santri['jenjang'] ?? '';
     alamatController.text = santri['alamat'] ?? '';
     waliController.text = santri['nama_wali'] ?? '';
+
     editingId = santri['id'];
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape:
-          const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (_) => _buildFormModal('Edit Data Santri', _updateSantri),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (_) => _buildFormModal(
+        'Edit Data Santri',
+        _updateSantri,
+      ),
     );
   }
 
-  Widget _buildFormModal(String title, Future<void> Function() onSave) {
+  Widget _buildFormModal(
+    String title,
+    Future<void> Function() onSave,
+  ) {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -163,37 +205,54 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
       ),
       child: Wrap(
         children: [
-          Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
           const SizedBox(height: 16),
 
           _input(namaController, 'Nama Lengkap'),
+
           const SizedBox(height: 12),
 
           TextField(
             controller: kelasController,
             keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly
+            ],
             decoration: const InputDecoration(
               labelText: 'Kelas (angka)',
               border: OutlineInputBorder(),
             ),
           ),
+
           const SizedBox(height: 12),
 
           _input(jenjangController, 'Jenjang (SMP / SMA)'),
+
           const SizedBox(height: 12),
 
           _input(alamatController, 'Alamat'),
+
           const SizedBox(height: 12),
 
           _input(waliController, 'Nama Orang Tua / Wali'),
+
           const SizedBox(height: 16),
 
           ElevatedButton(
             onPressed: onSave,
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.lime[600],
-              minimumSize: const Size(double.infinity, 50),
+              minimumSize: const Size(
+                double.infinity,
+                50,
+              ),
             ),
             child: const Text('Simpan'),
           ),
@@ -203,19 +262,31 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
   }
 
   // ================= HELPER =================
-  Widget _input(TextEditingController c, String label) => TextField(
-        controller: c,
-        decoration: InputDecoration(
-          labelText: label,
-          border: const OutlineInputBorder(),
-        ),
-      );
+  Widget _input(
+    TextEditingController c,
+    String label,
+  ) {
+    return TextField(
+      controller: c,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+    );
+  }
 
   void _afterSave(String message) async {
     _clearForm();
+
     Navigator.pop(context);
+
     await _fetchSantri();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   void _clearForm() {
@@ -224,12 +295,17 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
     jenjangController.clear();
     alamatController.clear();
     waliController.clear();
+
     editingId = null;
   }
 
   void _showError() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Semua field wajib diisi & kelas harus angka')),
+      const SnackBar(
+        content: Text(
+          'Semua field wajib diisi & kelas harus angka',
+        ),
+      ),
     );
   }
 
@@ -238,31 +314,54 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kelola Data Santri'),
+        title: Text(
+          userMarhalah == null
+              ? 'Kelola Data Santri'
+              : 'Kelola Santri $userMarhalah',
+        ),
         backgroundColor: Colors.lime[400],
       ),
+
       body: santriList.isEmpty
-          ? const Center(child: Text('Belum ada data santri'))
+          ? const Center(
+              child: Text('Belum ada data santri'),
+            )
           : ListView.builder(
               itemCount: santriList.length,
               itemBuilder: (_, index) {
                 final s = santriList[index];
+
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   child: ListTile(
                     title: Text(s['nama_lengkap']),
+
                     subtitle: Text(
-                        'Kelas ${s['kelas']} ${s['jenjang']} • ${s['alamat']}'),
+                      'Kelas ${s['kelas']} ${s['jenjang']} • ${s['alamat']}',
+                    ),
+
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () => _showEditSantriModal(s),
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Colors.blue,
+                          ),
+                          onPressed: () =>
+                              _showEditSantriModal(s),
                         ),
+
                         IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _deleteSantri(s['id']),
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Colors.red,
+                          ),
+                          onPressed: () =>
+                              _deleteSantri(s['id']),
                         ),
                       ],
                     ),
@@ -270,6 +369,7 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
                 );
               },
             ),
+
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.lime[600],
         onPressed: _showAddSantriModal,
@@ -277,4 +377,4 @@ class _KelolaDataSantriState extends State<KelolaDataSantri> {
       ),
     );
   }
-}
+} 
