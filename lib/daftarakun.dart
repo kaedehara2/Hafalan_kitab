@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hafalan_kitab/login.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'koneksi/supabase_config.dart';
 
 class DaftarAkun extends StatefulWidget {
@@ -25,26 +24,33 @@ class _DaftarAkunState extends State<DaftarAkun> {
 
   bool _isLoading = false;
 
+  // ================= DAFTAR AKUN =================
   Future<void> _daftarAkun() async {
 
     final username =
-        _usernameController.text.trim();
+        _usernameController.text
+            .trim()
+            .toLowerCase();
 
     final namaLengkap =
-        _namaLengkapController.text.trim();
+        _namaLengkapController.text
+            .trim();
 
     final password =
-        _passwordController.text.trim();
+        _passwordController.text
+            .trim();
 
     final marhalah =
         _selectedMarhalah;
 
+    // ================= VALIDASI =================
     if (username.isEmpty ||
         namaLengkap.isEmpty ||
         password.isEmpty ||
         marhalah == null) {
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
         const SnackBar(
           content: Text(
             'Semua kolom wajib diisi',
@@ -61,6 +67,10 @@ class _DaftarAkunState extends State<DaftarAkun> {
 
     try {
 
+      print('USERNAME DAFTAR : $username');
+      print('PASSWORD DAFTAR : $password');
+      print('MARHALAH : $marhalah');
+
       // ================= CEK USERNAME =================
       final checkUser =
           await SupabaseConfig.client
@@ -69,23 +79,29 @@ class _DaftarAkunState extends State<DaftarAkun> {
               .eq('username', username)
               .maybeSingle();
 
+      print('CEK USER : $checkUser');
+
       if (checkUser != null) {
         throw 'Username sudah digunakan';
       }
 
       // ================= INSERT DATA =================
-      await SupabaseConfig.client
-          .from('pembimbing')
-          .insert({
+      final insertResponse =
+          await SupabaseConfig.client
+              .from('pembimbing')
+              .insert({
 
         'username': username,
         'nama_lengkap': namaLengkap,
         'password': password,
         'marhalah': marhalah,
 
-      });
+      }).select();
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      print('INSERT RESPONSE : $insertResponse');
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
         const SnackBar(
           content: Text(
             'Registrasi berhasil',
@@ -93,6 +109,7 @@ class _DaftarAkunState extends State<DaftarAkun> {
         ),
       );
 
+      // ================= PINDAH LOGIN =================
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -102,7 +119,10 @@ class _DaftarAkunState extends State<DaftarAkun> {
 
     } catch (error) {
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      print('ERROR DAFTAR : $error');
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
         SnackBar(
           content: Text(
             'Gagal daftar: $error',
@@ -146,6 +166,7 @@ class _DaftarAkunState extends State<DaftarAkun> {
 
             // ================= USERNAME =================
             TextField(
+
               controller:
                   _usernameController,
 
@@ -161,6 +182,7 @@ class _DaftarAkunState extends State<DaftarAkun> {
 
             // ================= NAMA LENGKAP =================
             TextField(
+
               controller:
                   _namaLengkapController,
 
@@ -176,6 +198,7 @@ class _DaftarAkunState extends State<DaftarAkun> {
 
             // ================= PASSWORD =================
             TextField(
+
               controller:
                   _passwordController,
 
@@ -230,6 +253,7 @@ class _DaftarAkunState extends State<DaftarAkun> {
 
             const SizedBox(height: 24),
 
+            // ================= BUTTON =================
             SizedBox(
 
               width:
@@ -245,8 +269,7 @@ class _DaftarAkunState extends State<DaftarAkun> {
                 child:
                     _isLoading
                         ? const CircularProgressIndicator(
-                            color:
-                                Colors.white,
+                            color: Colors.white,
                           )
                         : const Text(
                             'Daftar',

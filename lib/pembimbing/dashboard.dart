@@ -37,12 +37,15 @@ class _DashboardPageState extends State<DashboardPage> {
 
     fetchSetoranKhataman();
 
-    _pages = [
-      buildBeranda(),
-      const PilihKitabPage(),
-      const RiwayatHafalanPage(),
-      const KelolaDataSantri(),
-    ];
+  _pages = [
+  buildBeranda(),
+  const PilihKitabPage(),
+  const RiwayatHafalanPage(),
+
+  KelolaDataSantri(
+    marhalah: widget.marhalah,
+  ),
+];
   }
 
   // ================= FETCH SETORAN =================
@@ -97,11 +100,14 @@ class _DashboardPageState extends State<DashboardPage> {
   void refreshPages() {
     setState(() {
       _pages = [
-        buildBeranda(),
-        const PilihKitabPage(),
-        const RiwayatHafalanPage(),
-        const KelolaDataSantri(),
-      ];
+  buildBeranda(),
+  const PilihKitabPage(),
+  const RiwayatHafalanPage(),
+
+  KelolaDataSantri(
+    marhalah: widget.marhalah,
+  ),
+];
     });
   }
 

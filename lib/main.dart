@@ -35,10 +35,10 @@ class MyApp extends StatelessWidget {
       ),
 
       // ================= HALAMAN AWAL =================
-      home: const DaftarAkun(),
+      //home: const DaftarAkun(),
 
       // contoh lain:
-      // home: LoginPage(),
+       home: Login(),
       // home: DashboardPage(username: 'Guest', marhalah: 'Marhalah 1'),
       // home: KelolaDataSantri(),
     );

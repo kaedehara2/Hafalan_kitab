@@ -1,155 +1,385 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfilPage extends StatefulWidget {
   final String username;
   final String marhalah;
 
-  const ProfilPage({super.key, required this.username, required this.marhalah});
+  const ProfilPage({
+    super.key,
+    required this.username,
+    required this.marhalah,
+  });
 
   @override
   State<ProfilPage> createState() => _ProfilPageState();
 }
 
 class _ProfilPageState extends State<ProfilPage> {
+
+  final supabase = Supabase.instance.client;
+
   final _formKey = GlobalKey<FormState>();
 
-  // Controller untuk form field
-  final TextEditingController _namaController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _alamatController = TextEditingController();
+  final TextEditingController _namaController =
+      TextEditingController();
+
+  final TextEditingController _usernameController =
+      TextEditingController();
+
+  final TextEditingController _passwordController =
+      TextEditingController();
 
   File? _imageFile;
+
+  String? fotoUrl;
+
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // Set default username dari Dashboard
-    _usernameController.text = widget.username;
+
+    _loadProfil();
   }
 
-  // Fungsi ambil foto dari galeri
+  // ================= LOAD DATA =================
+  Future<void> _loadProfil() async {
+
+    try {
+
+      final data = await supabase
+          .from('pembimbing')
+          .select()
+          .eq('username', widget.username)
+          .single();
+
+      _namaController.text =
+          data['nama_lengkap'] ?? '';
+
+      _usernameController.text =
+          data['username'] ?? '';
+
+      _passwordController.text =
+          data['password'] ?? '';
+
+      fotoUrl = data['foto_url'];
+
+      setState(() {});
+
+    } catch (e) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Gagal load profil: $e',
+          ),
+        ),
+      );
+    }
+  }
+
+  // ================= PILIH FOTO =================
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    final picker = ImagePicker();
+
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+    );
 
     if (image != null) {
+
       setState(() {
         _imageFile = File(image.path);
       });
     }
   }
 
-  // Fungsi Simpan Profil (akan diintegrasikan dengan Supabase nanti)
-  void _saveProfile() {
-    if (_formKey.currentState!.validate()) {
-      final String namaLengkap = _namaController.text;
-      final String username = _usernameController.text;
-      final String password = _passwordController.text;
-      final String alamat = _alamatController.text;
+  // ================= UPLOAD FOTO =================
+  Future<String?> _uploadFoto() async {
+
+    if (_imageFile == null) {
+      return fotoUrl;
+    }
+
+    try {
+
+      final fileName =
+          'profil_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+      await supabase.storage
+          .from('avatars')
+          .upload(
+            fileName,
+            _imageFile!,
+          );
+
+      final publicUrl = supabase.storage
+          .from('avatars')
+          .getPublicUrl(fileName);
+
+      return publicUrl;
+
+    } catch (e) {
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profil berhasil diperbarui')),
+        SnackBar(
+          content: Text(
+            'Upload foto gagal: $e',
+          ),
+        ),
       );
 
-      // TODO: Integrasikan ke Supabase untuk update data pembimbing
-      print("Nama: $namaLengkap");
-      print("Username: $username");
-      print("Password: $password");
-      print("Alamat: $alamat");
+      return null;
     }
   }
 
+  // ================= SIMPAN =================
+  Future<void> _saveProfile() async {
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+
+      final fotoBaru = await _uploadFoto();
+
+      await supabase
+          .from('pembimbing')
+          .update({
+
+        'nama_lengkap':
+            _namaController.text.trim(),
+
+        'username':
+            _usernameController.text
+                .trim()
+                .toLowerCase(),
+
+        'password':
+            _passwordController.text.trim(),
+
+        'foto_url': fotoBaru,
+
+      })
+          .eq(
+            'username',
+            widget.username,
+          );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Profil berhasil diperbarui',
+          ),
+        ),
+      );
+
+    } catch (e) {
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Gagal update profil: $e',
+          ),
+        ),
+      );
+
+    } finally {
+
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  // ================= UI =================
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+
       appBar: AppBar(
-        title: const Text("Profil Pembimbing"),
+        title: const Text(
+          "Profil Pembimbing",
+        ),
         backgroundColor: Colors.lime[400],
       ),
+
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+
+        padding: const EdgeInsets.all(16),
+
         child: Form(
+
           key: _formKey,
+
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Foto Profil
+
+              // ================= FOTO =================
               GestureDetector(
                 onTap: _pickImage,
+
                 child: CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.grey[300],
+
+                  radius: 55,
+
+                  backgroundColor:
+                      Colors.grey[300],
+
                   backgroundImage:
-                      _imageFile != null ? FileImage(_imageFile!) : null,
-                  child: _imageFile == null
-                      ? const Icon(Icons.camera_alt, size: 40, color: Colors.grey)
-                      : null,
+                      _imageFile != null
+
+                          ? FileImage(_imageFile!)
+
+                          : fotoUrl != null
+                              ? NetworkImage(fotoUrl!)
+                              : null
+                                  as ImageProvider?,
+
+                  child:
+                      _imageFile == null &&
+                              fotoUrl == null
+                          ? const Icon(
+                              Icons.camera_alt,
+                              size: 40,
+                            )
+                          : null,
                 ),
               ),
-              const SizedBox(height: 20),
 
-              // Nama Lengkap
+              const SizedBox(height: 24),
+
+              // ================= NAMA =================
               TextFormField(
-                controller: _namaController,
-                decoration: const InputDecoration(
+
+                controller:
+                    _namaController,
+
+                decoration:
+                    const InputDecoration(
                   labelText: "Nama Lengkap",
-                  border: OutlineInputBorder(),
+                  border:
+                      OutlineInputBorder(),
                 ),
-                validator: (value) =>
-                    value!.isEmpty ? "Nama Lengkap tidak boleh kosong" : null,
+
+                validator: (value) {
+
+                  if (value == null ||
+                      value.isEmpty) {
+
+                    return 'Nama tidak boleh kosong';
+                  }
+
+                  return null;
+                },
               ),
+
               const SizedBox(height: 16),
 
-              // Username
+              // ================= USERNAME =================
               TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(
+
+                controller:
+                    _usernameController,
+
+                decoration:
+                    const InputDecoration(
                   labelText: "Username",
-                  border: OutlineInputBorder(),
+                  border:
+                      OutlineInputBorder(),
                 ),
-                validator: (value) =>
-                    value!.isEmpty ? "Username tidak boleh kosong" : null,
+
+                validator: (value) {
+
+                  if (value == null ||
+                      value.isEmpty) {
+
+                    return 'Username tidak boleh kosong';
+                  }
+
+                  return null;
+                },
               ),
+
               const SizedBox(height: 16),
 
-              // Password
+              // ================= PASSWORD =================
               TextFormField(
-                controller: _passwordController,
+
+                controller:
+                    _passwordController,
+
                 obscureText: true,
-                decoration: const InputDecoration(
+
+                decoration:
+                    const InputDecoration(
                   labelText: "Password",
-                  border: OutlineInputBorder(),
+                  border:
+                      OutlineInputBorder(),
                 ),
-                validator: (value) =>
-                    value!.isEmpty ? "Password tidak boleh kosong" : null,
-              ),
-              const SizedBox(height: 16),
 
-              // Alamat
-              TextFormField(
-                controller: _alamatController,
-                decoration: const InputDecoration(
-                  labelText: "Alamat",
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 30),
+                validator: (value) {
 
-              // Tombol Simpan
+                  if (value == null ||
+                      value.isEmpty) {
+
+                    return 'Password tidak boleh kosong';
+                  }
+
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 24),
+
+              // ================= BUTTON =================
               SizedBox(
+
                 width: double.infinity,
+
                 child: ElevatedButton.icon(
-                  onPressed: _saveProfile,
-                  icon: const Icon(Icons.save),
-                  label: const Text("Simpan Perubahan"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lime[400],
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    textStyle: const TextStyle(fontSize: 16),
+
+                  onPressed:
+                      isLoading
+                          ? null
+                          : _saveProfile,
+
+                  icon: const Icon(
+                    Icons.save,
+                  ),
+
+                  label:
+                      isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              "Simpan Perubahan",
+                            ),
+
+                  style:
+                      ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.lime[400],
+
+                    foregroundColor:
+                        Colors.black,
+
+                    padding:
+                        const EdgeInsets.symmetric(
+                      vertical: 14,
+                    ),
                   ),
                 ),
               ),
