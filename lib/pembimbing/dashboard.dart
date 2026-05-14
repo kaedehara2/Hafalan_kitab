@@ -1,6 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import 'package:hafalan_kitab/login.dart';
 
 import 'profil.dart';
 import 'keloladatasantri/keloladatasantri.dart';
@@ -40,7 +41,6 @@ class _DashboardPageState
 
   // ================= DATA PROFIL =================
   String namaPembimbing = '';
-  String? fotoProfil;
 
   late List<Widget> _pages;
 
@@ -53,6 +53,7 @@ class _DashboardPageState
     loadProfilPembimbing();
 
     _pages = [
+
       buildBeranda(),
 
       const PilihKitabPage(),
@@ -68,6 +69,7 @@ class _DashboardPageState
   // ================= LOAD PROFIL =================
   Future<void>
       loadProfilPembimbing() async {
+
     try {
 
       final data = await supabase
@@ -85,10 +87,6 @@ class _DashboardPageState
 
         namaPembimbing =
             data['username'] ?? '';
-
-        fotoProfil =
-            data['foto_profil'];
-
       });
 
     } catch (e) {
@@ -195,12 +193,83 @@ class _DashboardPageState
   }
 
   // ================= LOGOUT =================
-  void _logout() {
+  Future<void> _logout() async {
 
-    Navigator.pushReplacementNamed(
-      context,
-      '/login',
+    final konfirmasi =
+        await showDialog<bool>(
+
+      context: context,
+
+      builder: (dialogContext) {
+
+        return AlertDialog(
+
+          title: const Text(
+            'Konfirmasi Logout',
+          ),
+
+          content: const Text(
+            'Apakah Anda ingin logout?',
+          ),
+
+          actions: [
+
+            TextButton(
+
+              onPressed: () {
+
+                Navigator.pop(
+                  dialogContext,
+                  false,
+                );
+              },
+
+              child: const Text(
+                'Tidak',
+              ),
+            ),
+
+            ElevatedButton(
+
+              style:
+                  ElevatedButton.styleFrom(
+                backgroundColor:
+                    Colors.red,
+              ),
+
+              onPressed: () {
+
+                Navigator.pop(
+                  dialogContext,
+                  true,
+                );
+              },
+
+              child: const Text(
+                'Ya',
+              ),
+            ),
+          ],
+        );
+      },
     );
+
+    // ================= PINDAH KE LOGIN =================
+    if (konfirmasi == true) {
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+
+        context,
+
+        MaterialPageRoute(
+          builder: (_) => Login(),
+        ),
+
+        (route) => false,
+      );
+    }
   }
 
   // ================= TITLE =================
@@ -264,23 +333,11 @@ class _DashboardPageState
                   backgroundColor:
                       Colors.white,
 
-                  backgroundImage:
-                      fotoProfil != null
-                          ? NetworkImage(
-                              fotoProfil!,
-                            )
-                          : null,
-
-                  child:
-                      fotoProfil == null
-                          ? const Icon(
-                              Icons
-                                  .menu_book_rounded,
-                              size: 30,
-                              color:
-                                  Colors.black,
-                            )
-                          : null,
+                  child: const Icon(
+                    Icons.menu_book_rounded,
+                    size: 30,
+                    color: Colors.black,
+                  ),
                 ),
 
                 const SizedBox(
@@ -390,164 +447,6 @@ class _DashboardPageState
 
           const SizedBox(
               height: 10),
-
-          // ================= LOADING =================
-          if (loadingKhataman)
-            const Center(
-              child: Padding(
-                padding:
-                    EdgeInsets.all(
-                        30),
-
-                child:
-                    CircularProgressIndicator(),
-              ),
-            )
-
-          // ================= EMPTY =================
-          else if (dataKhataman
-              .isEmpty)
-
-            Container(
-              padding:
-                  const EdgeInsets.all(
-                      24),
-
-              decoration:
-                  BoxDecoration(
-                color: Colors.white,
-
-                borderRadius:
-                    BorderRadius.circular(
-                        20),
-              ),
-
-              child:
-                  const Column(
-                children: [
-
-                  Icon(
-                    Icons.info_outline,
-                    size: 50,
-                    color:
-                        Colors.grey,
-                  ),
-
-                  SizedBox(
-                      height: 12),
-
-                  Text(
-                    "Belum ada data setoran khataman",
-                    style: TextStyle(
-                      color:
-                          Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            )
-
-          // ================= LIST =================
-          else
-
-            ...List.generate(
-              dataKhataman.length,
-              (i) {
-
-                final item =
-                    dataKhataman[i];
-
-                final santri =
-                    item['santri'];
-
-                return Container(
-
-                  margin:
-                      const EdgeInsets
-                          .only(
-                    bottom: 14,
-                  ),
-
-                  padding:
-                      const EdgeInsets
-                          .all(18),
-
-                  decoration:
-                      BoxDecoration(
-                    color:
-                        Colors.white,
-
-                    borderRadius:
-                        BorderRadius
-                            .circular(
-                                22),
-                  ),
-
-                  child: Row(
-                    children: [
-
-                      CircleAvatar(
-                        backgroundColor:
-                            Colors
-                                .lime[400],
-
-                        child:
-                            const Icon(
-                          Icons.person,
-                          color: Colors
-                              .black,
-                        ),
-                      ),
-
-                      const SizedBox(
-                          width: 14),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment
-                                  .start,
-
-                          children: [
-
-                            Text(
-                              santri[
-                                  'nama_lengkap'],
-
-                              style:
-                                  const TextStyle(
-                                fontWeight:
-                                    FontWeight
-                                        .bold,
-
-                                fontSize:
-                                    16,
-                              ),
-                            ),
-
-                            const SizedBox(
-                                height:
-                                    4),
-
-                            Text(
-                              "Kitab ${item['kitab']}",
-                            ),
-
-                            Text(
-                              "Kelas ${santri['kelas']}",
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      buildStatusBadge(
-                        item['status'],
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
         ],
       ),
     );
@@ -596,53 +495,6 @@ class _DashboardPageState
 
           Text(title),
         ],
-      ),
-    );
-  }
-
-  // ================= STATUS =================
-  Widget buildStatusBadge(
-      String status) {
-
-    Color warna =
-        Colors.orange;
-
-    if (status ==
-        'disetujui') {
-      warna = Colors.green;
-    }
-
-    if (status ==
-        'ditolak') {
-      warna = Colors.red;
-    }
-
-    return Container(
-
-      padding:
-          const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 6,
-      ),
-
-      decoration:
-          BoxDecoration(
-        color:
-            warna.withOpacity(0.2),
-
-        borderRadius:
-            BorderRadius.circular(
-                20),
-      ),
-
-      child: Text(
-        status.toUpperCase(),
-
-        style: TextStyle(
-          color: warna,
-          fontWeight:
-              FontWeight.bold,
-        ),
       ),
     );
   }
@@ -709,37 +561,33 @@ class _DashboardPageState
                         .isEmpty
                     ? widget.username
                     : namaPembimbing,
+
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight:
+                      FontWeight.bold,
+                ),
               ),
 
               accountEmail: Text(
                 'Marhalah: ${widget.marhalah}',
+
+                style: const TextStyle(
+                  color: Colors.black87,
+                ),
               ),
 
               currentAccountPicture:
-                  CircleAvatar(
+                  const CircleAvatar(
 
                 backgroundColor:
                     Colors.white,
 
-                backgroundImage:
-                    fotoProfil !=
-                            null
-                        ? NetworkImage(
-                            fotoProfil!,
-                          )
-                        : null,
-
-                child:
-                    fotoProfil ==
-                            null
-                        ? const Icon(
-                            Icons
-                                .person,
-                            size: 40,
-                            color: Colors
-                                .black,
-                          )
-                        : null,
+                child: Icon(
+                  Icons.person,
+                  size: 40,
+                  color: Colors.black,
+                ),
               ),
             ),
 
@@ -783,32 +631,11 @@ class _DashboardPageState
                   ),
                 );
 
-                loadProfilPembimbing();
-              },
-            ),
+                await loadProfilPembimbing();
 
-            // ================= PENGATURAN =================
-            ListTile(
-
-              leading:
-                  const Icon(
-                Icons.settings,
-              ),
-
-              title:
-                  const Text(
-                'Pengaturan',
-              ),
-
-              onTap: () {
-                Navigator.pop(
-                    context);
-
-                Navigator
-                    .pushNamed(
-                  context,
-                  '/pengaturan',
-                );
+                if (mounted) {
+                  setState(() {});
+                }
               },
             ),
 
@@ -826,6 +653,7 @@ class _DashboardPageState
               title:
                   const Text(
                 'Logout',
+
                 style: TextStyle(
                   color:
                       Colors.red,
