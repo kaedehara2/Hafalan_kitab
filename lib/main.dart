@@ -3,6 +3,7 @@ import 'package:hafalan_kitab/koneksi/supabase_config.dart';
 import 'package:hafalan_kitab/login.dart';
 import 'package:hafalan_kitab/pembimbing/dashboard.dart';
 import 'package:hafalan_kitab/pembimbing/keloladatasantri/keloladatasantri.dart';
+import 'package:hafalan_kitab/pembimbing/marhalah2/jurumiyah.dart';
 import 'package:hafalan_kitab/pembimbing/profil.dart';
 import 'package:hafalan_kitab/daftarakun.dart'; // tambah ini
 import 'package:intl/date_symbol_data_local.dart';
@@ -36,9 +37,9 @@ class MyApp extends StatelessWidget {
 
       // ================= HALAMAN AWAL =================
       //home: const DaftarAkun(),
-
+//home: JurumiyahPage(),
       // contoh lain:
-       home: Login(),
+      home: Login(),
       // home: DashboardPage(username: 'Guest', marhalah: 'Marhalah 1'),
       // home: KelolaDataSantri(),
     );
