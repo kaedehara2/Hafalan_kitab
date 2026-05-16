@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AwamilPage extends StatefulWidget {
-  const AwamilPage({super.key});
+
+  final String username;
+  const AwamilPage({
+    
+    super.key,
+    required this.username});
 
   @override
   State<AwamilPage> createState() => _AwamilPageState();
@@ -195,13 +200,17 @@ class _AwamilPageState extends State<AwamilPage> {
           : "$bagianAwal - $bagianAkhir";
 
       await supabase.from('hafalan_santri').insert({
-        'santri_id': santriId,
-        'kitab': 'awamil',
-        'bagian_awal': bagianAwal,
-        'bagian_akhir': bagianAkhir,
-        'bagian': bagianText,
-        'status': penilaian,
-      });
+      'santri_id': santriId,
+      'kitab': 'awamil',
+      'bagian_awal': bagianAwal,
+      'bagian_akhir': bagianAkhir,
+      'bagian': bagianText,
+      'status': penilaian,
+
+      // ================= TAMBAHAN =================
+      'pembimbing_input': widget.username,
+      'mode_setoran': 'normal',
+    });
 
       // refresh riwayat
       await fetchRiwayat(santriId);

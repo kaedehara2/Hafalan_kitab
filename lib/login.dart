@@ -174,7 +174,7 @@ class _LoginState extends State<Login> {
 
               // ================= LOGO =================
               Image.asset(
-                'assets/logo.png',
+                'assets/logobaru.png',
                 height: 100,
               ),
 

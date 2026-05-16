@@ -52,18 +52,20 @@ class _DashboardPageState
 
     loadProfilPembimbing();
 
-    _pages = [
+   _pages = [
 
-      buildBeranda(),
+  buildBeranda(),
 
-      const PilihKitabPage(),
+  PilihKitabPage(
+    username: widget.username,
+  ),
 
-      const RiwayatHafalanPage(),
+  const RiwayatHafalanPage(),
 
-      KelolaDataSantri(
-        marhalah: widget.marhalah,
-      ),
-    ];
+  KelolaDataSantri(
+    marhalah: widget.marhalah,
+  ),
+];
   }
 
   // ================= LOAD PROFIL =================
@@ -159,22 +161,24 @@ class _DashboardPageState
   // ================= REFRESH =================
   void refreshPages() {
 
-    setState(() {
+  setState(() {
 
-      _pages = [
+    _pages = [
 
-        buildBeranda(),
+      buildBeranda(),
 
-        const PilihKitabPage(),
+      PilihKitabPage(
+        username: widget.username,
+      ),
 
-        const RiwayatHafalanPage(),
+      const RiwayatHafalanPage(),
 
-        KelolaDataSantri(
-          marhalah: widget.marhalah,
-        ),
-      ];
-    });
-  }
+      KelolaDataSantri(
+        marhalah: widget.marhalah,
+      ),
+    ];
+  });
+}
 
   // ================= NAVIGATION =================
   void _onItemTapped(
@@ -188,7 +192,8 @@ class _DashboardPageState
 
       await fetchSetoranKhataman();
 
-      refreshPages();
+      refreshPages(
+      );
     }
   }
 

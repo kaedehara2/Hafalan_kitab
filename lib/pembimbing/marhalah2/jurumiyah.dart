@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class JurumiyahPage extends StatefulWidget {
-  const JurumiyahPage({super.key});
+
+  final String username;
+
+  const JurumiyahPage({
+    super.key,
+    required this.username,
+  });
 
   @override
-  State<JurumiyahPage> createState() => _JurumiyahPageState();
+  State<JurumiyahPage> createState() =>
+      _JurumiyahPageState();
 }
 
 class _JurumiyahPageState extends State<JurumiyahPage> {
