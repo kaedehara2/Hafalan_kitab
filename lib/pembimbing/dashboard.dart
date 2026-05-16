@@ -7,6 +7,7 @@ import 'profil.dart';
 import 'keloladatasantri/keloladatasantri.dart';
 import 'marhalah1/pilih_kitab.dart';
 import 'riwayathafalan.dart';
+import 'setorancadangan.dart';
 
 class DashboardPage extends StatefulWidget {
 
@@ -645,6 +646,34 @@ class _DashboardPageState
             ),
 
             const Divider(),
+
+            ListTile(
+
+  leading: const Icon(
+    Icons.swap_horiz,
+    color: Colors.orange,
+  ),
+
+  title: const Text(
+    'Setoran Cadangan',
+  ),
+
+  onTap: () {
+
+    Navigator.pop(context);
+
+    Navigator.push(
+      context,
+
+      MaterialPageRoute(
+        builder: (_) =>
+            SetoranCadanganPage(
+          username: widget.username,
+        ),
+      ),
+    );
+  },
+),
 
             // ================= LOGOUT =================
             ListTile(

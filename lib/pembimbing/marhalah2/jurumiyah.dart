@@ -238,13 +238,25 @@ class _JurumiyahPageState extends State<JurumiyahPage> {
           : "$bagianAwal - $bagianAkhir";
 
       await supabase.from('hafalan_santri').insert({
-        'santri_id': santriId,
-        'kitab': 'jurumiyah',
-        'bagian_awal': bagianAwal,
-        'bagian_akhir': bagianAkhir,
-        'bagian': bagianText,
-        'status': penilaian,
-      });
+
+      'santri_id': santriId,
+
+      'kitab': 'jurumiyah',
+
+      'bagian_awal': bagianAwal,
+
+      'bagian_akhir': bagianAkhir,
+
+      'bagian': bagianText,
+
+      'status': penilaian,
+
+      // ================= PEMBIMBING =================
+      'pembimbing_input': widget.username,
+
+      // ================= SETORAN NORMAL =================
+      'is_setoran_cadangan': false,
+    });
 
       // refresh riwayat
       await fetchRiwayat(santriId);
