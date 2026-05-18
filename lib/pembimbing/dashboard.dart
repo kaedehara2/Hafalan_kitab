@@ -61,7 +61,10 @@ class _DashboardPageState
     username: widget.username,
   ),
 
-  const RiwayatHafalanPage(),
+  RiwayatHafalanPage(
+    username:
+      widget.username,
+  ),
 
   KelolaDataSantri(
     marhalah: widget.marhalah,
@@ -172,7 +175,9 @@ class _DashboardPageState
         username: widget.username,
       ),
 
-      const RiwayatHafalanPage(),
+      RiwayatHafalanPage(
+        username: widget.username,
+      ),
 
       KelolaDataSantri(
         marhalah: widget.marhalah,
