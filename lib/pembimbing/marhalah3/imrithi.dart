@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ImritiPage extends StatelessWidget {
-  const ImritiPage ({super.key});
+class ImrithiPage extends StatelessWidget {
+  const ImrithiPage ({super.key});
 
   @override
   Widget build(BuildContext context) {

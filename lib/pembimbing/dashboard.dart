@@ -5,7 +5,7 @@ import 'package:hafalan_kitab/login.dart';
 
 import 'profil.dart';
 import 'keloladatasantri/keloladatasantri.dart';
-import 'marhalah1/pilih_kitab.dart';
+import 'package:hafalan_kitab/pembimbing/pilihkitab.dart';
 import 'riwayathafalan.dart';
 import 'setorancadangan.dart';
 
@@ -58,7 +58,10 @@ class _DashboardPageState
   buildBeranda(),
 
   PilihKitabPage(
-    username: widget.username,
+    username: 
+    widget.username,
+    marhalah:
+      widget.marhalah,
   ),
 
   RiwayatHafalanPage(
@@ -172,7 +175,10 @@ class _DashboardPageState
       buildBeranda(),
 
       PilihKitabPage(
-        username: widget.username,
+      username: 
+        widget.username,
+      marhalah:
+        widget.marhalah,
       ),
 
       RiwayatHafalanPage(
