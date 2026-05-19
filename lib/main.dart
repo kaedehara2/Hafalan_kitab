@@ -3,11 +3,12 @@ import 'package:hafalan_kitab/koneksi/supabase_config.dart';
 import 'package:hafalan_kitab/login.dart';
 import 'package:hafalan_kitab/pembimbing/dashboard.dart';
 import 'package:hafalan_kitab/pembimbing/keloladatasantri/keloladatasantri.dart';
-import 'package:hafalan_kitab/pembimbing/marhalah2/jurumiyah.dart';
+// import 'package:hafalan_kitab/pembimbing/marhalah2/jurumiyah.dart';
 import 'package:hafalan_kitab/pembimbing/profil.dart';
 import 'package:hafalan_kitab/daftarakun.dart'; // tambah ini
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:hafalan_kitab/admin/dashboardadmin.dart';
+import 'package:hafalan_kitab/admin/approvesetoran.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -41,7 +42,8 @@ class MyApp extends StatelessWidget {
 //home: JurumiyahPage(),
       // contoh lain:
       //home: DashboardAdminPage(),
-       home: Login(),
+      home: ApproveKhatamanPage(),
+      // home: Login(),
       // home: DashboardPage(username: 'Guest', marhalah: 'Marhalah 1'),
       // home: KelolaDataSantri(),
     );
