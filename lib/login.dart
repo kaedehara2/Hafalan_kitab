@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hafalan_kitab/pembimbing/dashboard.dart';
+import 'package:hafalan_kitab/admin/dashboardadmin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'daftarakun.dart';
 
@@ -63,7 +64,14 @@ class _LoginState extends State<Login> {
           await Supabase.instance.client
               .from('pembimbing')
               .select(
-                'id, username, nama_lengkap, marhalah, password',
+                '''
+                id,
+                username,
+                nama_lengkap,
+                marhalah,
+                password,
+                role
+                ''',
               )
               .eq('username', username)
               .maybeSingle();
@@ -85,25 +93,43 @@ class _LoginState extends State<Login> {
             ),
           );
 
-          // ================= MASUK DASHBOARD =================
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DashboardPage(
+          // ================= ROLE =================
+          final role =
+              response['role'] ?? 'pembimbing';
 
+          // ================= LOGIN ADMIN =================
+          if (role == 'admin') {
 
-                idPembimbing: 
-                    response['id'],
-
-                username:
-                    response['username'],
-
-                marhalah:
-                    response['marhalah'],
-
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    const DashboardAdminPage(),
               ),
-            ),
-          );
+            );
+
+          }
+
+          // ================= LOGIN PEMBIMBING =================
+          else {
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DashboardPage(
+
+                  idPembimbing:
+                      response['id'],
+
+                  username:
+                      response['username'],
+
+                  marhalah:
+                      response['marhalah'],
+                ),
+              ),
+            );
+          }
 
         } else {
 
