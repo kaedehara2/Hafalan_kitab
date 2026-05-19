@@ -7,6 +7,7 @@ import 'package:hafalan_kitab/pembimbing/marhalah2/jurumiyah.dart';
 import 'package:hafalan_kitab/pembimbing/profil.dart';
 import 'package:hafalan_kitab/daftarakun.dart'; // tambah ini
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:hafalan_kitab/admin/dashboardadmin.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +40,8 @@ class MyApp extends StatelessWidget {
       //home: const DaftarAkun(),
 //home: JurumiyahPage(),
       // contoh lain:
-      home: Login(),
+      home: DashboardAdminPage(),
+      // home: Login(),
       // home: DashboardPage(username: 'Guest', marhalah: 'Marhalah 1'),
       // home: KelolaDataSantri(),
     );
