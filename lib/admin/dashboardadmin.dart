@@ -231,7 +231,7 @@ class _DashboardAdminPageState
                     icon:
                         Icons.menu_book_outlined,
 
-                    title: 'Setoran',
+                    title: 'Setoran/Khataman',
 
                     onTap: () {
 
