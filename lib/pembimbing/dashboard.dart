@@ -10,7 +10,6 @@ import 'riwayathafalan.dart';
 import 'setorancadangan.dart';
 
 class DashboardPage extends StatefulWidget {
-
   final String idPembimbing;
   final String username;
   final String marhalah;
@@ -53,26 +52,29 @@ class _DashboardPageState
 
     loadProfilPembimbing();
 
-   _pages = [
+    buildPages();
+  }
 
-  buildBeranda(),
+  // ================= BUILD PAGES =================
+  void buildPages() {
 
-  PilihKitabPage(
-    username: 
-    widget.username,
-    marhalah:
-      widget.marhalah,
-  ),
+    _pages = [
 
-  RiwayatHafalanPage(
-    username:
-      widget.username,
-  ),
+      buildBeranda(),
 
-  KelolaDataSantri(
-    marhalah: widget.marhalah,
-  ),
-];
+      PilihKitabPage(
+        username: widget.username,
+        marhalah: widget.marhalah,
+      ),
+
+      RiwayatHafalanPage(
+        username: widget.username,
+      ),
+
+      KelolaDataSantri(
+        marhalah: widget.marhalah,
+      ),
+    ];
   }
 
   // ================= LOAD PROFIL =================
@@ -100,7 +102,7 @@ class _DashboardPageState
 
     } catch (e) {
 
-      print(
+      debugPrint(
         'Gagal load profil: $e',
       );
     }
@@ -168,29 +170,11 @@ class _DashboardPageState
   // ================= REFRESH =================
   void refreshPages() {
 
-  setState(() {
+    setState(() {
 
-    _pages = [
-
-      buildBeranda(),
-
-      PilihKitabPage(
-      username: 
-        widget.username,
-      marhalah:
-        widget.marhalah,
-      ),
-
-      RiwayatHafalanPage(
-        username: widget.username,
-      ),
-
-      KelolaDataSantri(
-        marhalah: widget.marhalah,
-      ),
-    ];
-  });
-}
+      buildPages();
+    });
+  }
 
   // ================= NAVIGATION =================
   void _onItemTapped(
@@ -204,8 +188,7 @@ class _DashboardPageState
 
       await fetchSetoranKhataman();
 
-      refreshPages(
-      );
+      refreshPages();
     }
   }
 
@@ -658,33 +641,36 @@ class _DashboardPageState
 
             const Divider(),
 
+            // ================= SETORAN CADANGAN =================
             ListTile(
 
-  leading: const Icon(
-    Icons.swap_horiz,
-    color: Colors.orange,
-  ),
+              leading: const Icon(
+                Icons.swap_horiz,
+                color: Colors.orange,
+              ),
 
-  title: const Text(
-    'Setoran Cadangan',
-  ),
+              title: const Text(
+                'Setoran Cadangan',
+              ),
 
-  onTap: () {
+              onTap: () {
 
-    Navigator.pop(context);
+                Navigator.pop(context);
 
-    Navigator.push(
-      context,
+                Navigator.push(
+                  context,
 
-      MaterialPageRoute(
-        builder: (_) =>
-            SetoranCadanganPage(
-          username: widget.username,
-        ),
-      ),
-    );
-  },
-),
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        SetoranCadanganPage(
+                      username: widget.username,
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            const Spacer(),
 
             // ================= LOGOUT =================
             ListTile(

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../marhalah1/awamil.dart';
-import '../marhalah1/babulminan.dart';
+import 'marhalah1/awamil.dart';
+import 'marhalah1/babulminan.dart';
 
-import '../marhalah2/jurumiyah.dart';
+import 'marhalah2/jurumiyah.dart';
 
-import '../marhalah3/imrithi.dart';
-import '../marhalah3/maqsud.dart';
-
-import '../marhalah4/alfiyah.dart';
+import 'marhalah3/imrithi.dart';
+import 'marhalah3/maqsud.dart';
+import 'marhalah4/alfiyah.dart';
 
 class PilihKitabPage extends StatelessWidget {
   final String username;
