@@ -41,9 +41,9 @@ class MyApp extends StatelessWidget {
       //home: const DaftarAkun(),
 //home: JurumiyahPage(),
       // contoh lain:
-      //home: DashboardAdminPage(),
-      home: ApproveKhatamanPage(),
-      // home: Login(),
+      // home: DashboardAdminPage(),
+       home: ApproveKhatamanPage(),
+       // home: Login(),
       // home: DashboardPage(username: 'Guest', marhalah: 'Marhalah 1'),
       // home: KelolaDataSantri(),
     );
