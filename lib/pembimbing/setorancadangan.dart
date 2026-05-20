@@ -3,10 +3,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SetoranCadanganPage extends StatefulWidget {
   final String username;
+  final String marhalah;
 
   const SetoranCadanganPage({
     super.key,
     required this.username,
+    required this.marhalah,
   });
 
   @override
@@ -77,7 +79,8 @@ class _SetoranCadanganPageState
     try {
       final santri = await supabase
           .from('santri')
-          .select('id, nama_lengkap')
+          .select('id, nama_lengkap, marhalah')
+         // .eq('marhalah', widget.marhalah)
           .order('nama_lengkap');
 
       final pembimbing = await supabase
@@ -274,8 +277,7 @@ class _SetoranCadanganPageState
                               santri,
 
                           child: Text(
-                            santri[
-                                'nama_lengkap'],
+                          '${santri['nama_lengkap']} (${santri['marhalah']})',
                           ),
                         );
                       },

@@ -664,6 +664,7 @@ class _DashboardPageState
                     builder: (_) =>
                         SetoranCadanganPage(
                       username: widget.username,
+                      marhalah: widget.marhalah,
                     ),
                   ),
                 );
