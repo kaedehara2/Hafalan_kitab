@@ -100,6 +100,7 @@ class _JurumiyahPageState extends State<JurumiyahPage> {
       final data = await supabase
           .from('santri')
           .select('id, nama_lengkap, kelas')
+          .eq('marhalah', 'Marhalah 2')
           .order('nama_lengkap');
 
       if (!mounted) return;

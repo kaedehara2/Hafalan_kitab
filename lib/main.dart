@@ -42,8 +42,8 @@ class MyApp extends StatelessWidget {
 //home: JurumiyahPage(),
       // contoh lain:
       // home: DashboardAdminPage(),
-       home: ApproveKhatamanPage(),
-       // home: Login(),
+      // home: ApproveKhatamanPage(),
+        home: Login(),
       // home: DashboardPage(username: 'Guest', marhalah: 'Marhalah 1'),
       // home: KelolaDataSantri(),
     );

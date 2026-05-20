@@ -62,6 +62,7 @@ class _AwamilPageState extends State<AwamilPage> {
       final data = await supabase
           .from('santri')
           .select('id, nama_lengkap, kelas')
+          .eq('marhalah', 'Marhalah 1')
           .order('nama_lengkap');
 
       if (!mounted) return;
