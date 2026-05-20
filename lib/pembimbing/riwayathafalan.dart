@@ -570,7 +570,7 @@ class _RiwayatHafalanPageState
                     EdgeInsets.all(6),
 
                 child: Text(
-                  'Pembimbing Asal',
+                  'Pembimbing Pengganti',
 
                   style: TextStyle(
                     fontWeight:

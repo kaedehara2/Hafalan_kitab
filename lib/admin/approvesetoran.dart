@@ -320,9 +320,19 @@ class _ApproveKhatamanPageState
                               'setoran_khataman')
                           .update({
 
+                        // ================= SIMPAN TANGGAL =================
                         'jadwal_setoran':
                             selectedDate!
                                 .toIso8601String(),
+
+                        // ================= STATUS KHATAMAN =================
+
+                        'status': 'dijadwalkan',
+
+                         // ================= STATUS JADWAL =================
+
+                        'status_jadwal':
+                            'sudah dijadwalkan',
 
                       }).eq(
                         'id',
@@ -381,8 +391,16 @@ class _ApproveKhatamanPageState
           .from('setoran_khataman')
           .update({
 
+            //===status khataman===//
+
         'status': 'disetujui',
 
+            //===status jadwal===//
+
+        'status_jadwal': 'selesai',
+
+            //===tanggal approve===//
+        
         'tanggal_approve':
             DateTime.now()
                 .toIso8601String(),
@@ -898,7 +916,9 @@ class _ApproveKhatamanPageState
 
                 // ================= BUTTON =================
                 if (status ==
-                    'pending')
+                    'pending' || 
+                    status == 
+                    'dijadwalkan')
 
                   Column(
 
