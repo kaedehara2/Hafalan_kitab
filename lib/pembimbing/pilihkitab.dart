@@ -121,32 +121,36 @@ class PilihKitabPage extends StatelessWidget {
             ],
 
             // ================= MARHALAH 3 =================
-            if (marhalah == 'Marhalah 3') ...[
+                if (marhalah == 'Marhalah 3') ...[
 
-              const Text(
-                "Marhalah 3",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              _buildKitabCard(
-                context,
-                title: "Kitab Nadhom Imrithi",
-                subtitle: "Dalam Pengembangan",
-                onTap: () {
-
-                  Navigator.push(
-                    context,
-
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          const ImrithiPage(),
+                  const Text(
+                    "Marhalah 3",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  _buildKitabCard(
+                    context,
+                    title: "Kitab Nadhom Imrithi",
+                    subtitle: "Nahw Nadzam Per-Bait",
+                    onTap: () {
+
+                      Navigator.push(
+                        context,
+
+                        MaterialPageRoute(
+                          builder: (_) => ImrithiPage(
+
+                            username:
+                                username,
+
+                    ),
+                  ),
+                );
                 },
               ),
 
