@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'grafik.dart';
 
 class DashboardAdminPage extends StatefulWidget {
 
@@ -19,228 +20,255 @@ class _DashboardAdminPageState
 
     return Scaffold(
 
-      backgroundColor:
-          Colors.grey[200],
+      backgroundColor: Colors.grey[200],
 
       body: SafeArea(
 
-        child: Padding(
+        child: SingleChildScrollView(
 
-          padding:
-              const EdgeInsets.all(16),
+          child: Padding(
 
-          child: Column(
+            padding: const EdgeInsets.all(16),
 
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            child: Column(
 
-            children: [
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
 
-              // ================= HEADER =================
-              Container(
+              children: [
 
-                width: double.infinity,
+                // ================= HEADER =================
+                Container(
 
-                padding:
-                    const EdgeInsets.all(20),
+                  width: double.infinity,
 
-                decoration: BoxDecoration(
+                  padding:
+                      const EdgeInsets.all(20),
 
-                  color:
-                      Colors.lime[400],
+                  decoration: BoxDecoration(
 
-                  borderRadius:
-                      BorderRadius.circular(
-                          26),
-                ),
+                    color: Colors.lime[400],
 
-                child: Column(
+                    borderRadius:
+                        BorderRadius.circular(26),
+                  ),
 
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  child: Column(
 
-                  children: [
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
 
-                    // ================= TOP =================
-                    Row(
+                    children: [
 
-                      mainAxisAlignment:
-                          MainAxisAlignment
-                              .spaceBetween,
-
-                      children: [
-
-                        const SizedBox(),
-
-                        Column(
-
-                          children: [
-
-                            IconButton(
-
-                              onPressed: () {
-
-                                // ================= LOGOUT =================
-                              },
-
-                              icon: const Icon(
-                                Icons.logout,
-                                color: Colors.red,
-                                size: 30,
-                              ),
-                            ),
-
-                            const Text(
-                              'Logout',
-                              style: TextStyle(
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // ================= TEXT =================
-                    const Text(
-
-                      'Selamat Datang',
-
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    const Text(
-
-                      'Admin',
-
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight:
-                            FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    const Text(
-
-                      '(Pengasuh/Pengurus Pesantren)',
-
-                      style: TextStyle(
-                        fontSize: 13,
-                      ),
-                    ),
-
-                    const SizedBox(height: 26),
-
-                    // ================= CARD GRAFIK =================
-                    Container(
-
-                      width: double.infinity,
-
-                      height: 170,
-
-                      padding:
-                          const EdgeInsets.all(
-                              16),
-
-                      decoration: BoxDecoration(
-
-                        color: Colors.white,
-
-                        borderRadius:
-                            BorderRadius.circular(
-                                18),
-                      ),
-
-                      child: Column(
+                      // ================= LOGOUT =================
+                      Row(
 
                         mainAxisAlignment:
-                            MainAxisAlignment
-                                .center,
+                            MainAxisAlignment.end,
 
                         children: [
 
-                          const Text(
+                          Column(
 
-                            'Grafik Monitoring Hafalan',
+                            children: [
 
-                            style: TextStyle(
-                              fontWeight:
-                                  FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
+                              IconButton(
 
-                          const SizedBox(
-                              height: 20),
+                                onPressed: () {
 
-                          Icon(
-                            Icons.bar_chart,
-                            size: 70,
-                            color: Colors.grey[700],
-                          ),
+                                  // ================= LOGOUT =================
+                                },
 
-                          const SizedBox(
-                              height: 10),
+                                icon: const Icon(
 
-                          const Text(
-                            'Grafik akan dikembangkan',
+                                  Icons.logout,
+
+                                  color: Colors.red,
+
+                                  size: 28,
+                                ),
+                              ),
+
+                              const Text(
+
+                                'Logout',
+
+                                style: TextStyle(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+
+                      const SizedBox(height: 8),
+
+                      // ================= TEXT =================
+                      const Text(
+
+                        'Selamat Datang',
+
+                        style: TextStyle(
+                          fontSize: 17,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      const Text(
+
+                        'Admin',
+
+                        style: TextStyle(
+
+                          fontSize: 26,
+
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      const Text(
+
+                        '(Pengasuh/Pengurus Pesantren)',
+
+                        style: TextStyle(
+                          fontSize: 13,
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // ================= CARD GRAFIK =================
+                      Container(
+
+                        width: double.infinity,
+
+                        padding:
+                            const EdgeInsets.all(16),
+
+                        decoration: BoxDecoration(
+
+                          color: Colors.white,
+
+                          borderRadius:
+                              BorderRadius.circular(20),
+
+                          boxShadow: [
+
+                            BoxShadow(
+
+                              color: Colors.grey
+                                  .withOpacity(0.15),
+
+                              blurRadius: 6,
+
+                              offset:
+                                  const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+
+                        child: Column(
+
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+
+                          children: [
+
+                            const Text(
+
+                              'Grafik Monitoring Hafalan',
+
+                              style: TextStyle(
+
+                                fontWeight:
+                                    FontWeight.bold,
+
+                                fontSize: 16,
+                              ),
+                            ),
+
+                            const SizedBox(height: 6),
+
+                            const Text(
+
+                              'Aktivitas Setoran Per Marhalah',
+
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // ================= GRAFIK =================
+                            const Grafik(),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // ================= MENU TITLE =================
+                const Text(
+
+                  'Menu Admin',
+
+                  style: TextStyle(
+
+                    fontSize: 18,
+
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                // ================= MENU =================
+                Row(
+
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceEvenly,
+
+                  children: [
+
+                    // ================= MONITORING =================
+                    buildMenuItem(
+
+                      icon: Icons.analytics_outlined,
+
+                      title: 'Monitoring',
+
+                      onTap: () {
+
+                        // ================= MENU MONITORING =================
+                      },
+                    ),
+
+                    // ================= APPROVE =================
+                    buildMenuItem(
+
+                      icon: Icons.fact_check_outlined,
+
+                      title: 'Approve',
+
+                      onTap: () {
+
+                        // ================= MENU APPROVE =================
+                      },
                     ),
                   ],
                 ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // ================= MENU =================
-              Row(
-
-                mainAxisAlignment:
-                    MainAxisAlignment
-                        .spaceEvenly,
-
-                children: [
-
-                  // ================= MONITORING =================
-                  buildMenuItem(
-
-                    icon:
-                        Icons.monitor_heart_outlined,
-
-                    title: 'Monitoring',
-
-                    onTap: () {
-
-                      // ================= MENU MONITORING =================
-                    },
-                  ),
-
-                  // ================= SETORAN =================
-                  buildMenuItem(
-
-                    icon:
-                        Icons.menu_book_outlined,
-
-                    title: 'Setoran/Khataman',
-
-                    onTap: () {
-
-                      // ================= MENU APPROVE =================
-                    },
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -256,61 +284,71 @@ class _DashboardAdminPageState
 
   }) {
 
-    return Column(
+    return InkWell(
 
-      children: [
+      onTap: onTap,
 
-        InkWell(
+      borderRadius:
+          BorderRadius.circular(22),
 
-          onTap: onTap,
+      child: Container(
+
+        width: 140,
+
+        padding:
+            const EdgeInsets.symmetric(
+
+          vertical: 24,
+          horizontal: 12,
+        ),
+
+        decoration: BoxDecoration(
+
+          color: Colors.white,
 
           borderRadius:
-              BorderRadius.circular(20),
+              BorderRadius.circular(22),
 
-          child: Container(
+          boxShadow: [
 
-            width: 95,
-            height: 95,
+            BoxShadow(
 
-            decoration: BoxDecoration(
+              color:
+                  Colors.grey.withOpacity(0.15),
 
-              color: Colors.white,
+              blurRadius: 6,
 
-              borderRadius:
-                  BorderRadius.circular(
-                      20),
-
-              boxShadow: [
-
-                BoxShadow(
-
-                  color: Colors.grey
-                      .withOpacity(0.2),
-
-                  blurRadius: 6,
-
-                  offset:
-                      const Offset(0, 3),
-                ),
-              ],
+              offset:
+                  const Offset(0, 3),
             ),
+          ],
+        ),
 
-            child: Icon(
+        child: Column(
+
+          children: [
+
+            Icon(
               icon,
               size: 42,
             ),
-          ),
-        ),
 
-        const SizedBox(height: 10),
+            const SizedBox(height: 14),
 
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 15,
-          ),
+            Text(
+
+              title,
+
+              style: const TextStyle(
+
+                fontSize: 15,
+
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
