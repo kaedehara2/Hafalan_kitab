@@ -8,8 +8,10 @@ import 'keloladatasantri/keloladatasantri.dart';
 import 'package:hafalan_kitab/pembimbing/pilihkitab.dart';
 import 'riwayathafalan.dart';
 import 'setorancadangan.dart';
+import 'datakhataman.dart';
 
 class DashboardPage extends StatefulWidget {
+
   final String idPembimbing;
   final String username;
   final String marhalah;
@@ -34,11 +36,6 @@ class _DashboardPageState
 
   int _selectedIndex = 0;
 
-  bool loadingKhataman = true;
-
-  List<Map<String, dynamic>>
-      dataKhataman = [];
-
   // ================= DATA PROFIL =================
   String namaPembimbing = '';
 
@@ -47,8 +44,6 @@ class _DashboardPageState
   @override
   void initState() {
     super.initState();
-
-    fetchSetoranKhataman();
 
     loadProfilPembimbing();
 
@@ -108,65 +103,6 @@ class _DashboardPageState
     }
   }
 
-  // ================= FETCH SETORAN =================
-  Future<void>
-      fetchSetoranKhataman() async {
-
-    setState(() {
-      loadingKhataman = true;
-    });
-
-    try {
-
-      final data = await supabase
-          .from('setoran_khataman')
-          .select('''
-            id,
-            kitab,
-            status,
-            tanggal_pengajuan,
-            tanggal_setoran,
-            santri (
-              nama_lengkap,
-              kelas
-            )
-          ''')
-          .order(
-            'tanggal_pengajuan',
-            ascending: false,
-          );
-
-      if (!mounted) return;
-
-      setState(() {
-
-        dataKhataman =
-            List<Map<String,
-                dynamic>>.from(data);
-
-        loadingKhataman = false;
-
-      });
-
-    } catch (e) {
-
-      if (!mounted) return;
-
-      setState(() {
-        loadingKhataman = false;
-      });
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-        SnackBar(
-          content: Text(
-            "Gagal mengambil data khataman: $e",
-          ),
-        ),
-      );
-    }
-  }
-
   // ================= REFRESH =================
   void refreshPages() {
 
@@ -178,15 +114,13 @@ class _DashboardPageState
 
   // ================= NAVIGATION =================
   void _onItemTapped(
-      int index) async {
+      int index) {
 
     setState(() {
       _selectedIndex = index;
     });
 
     if (index == 0) {
-
-      await fetchSetoranKhataman();
 
       refreshPages();
     }
@@ -297,211 +231,323 @@ class _DashboardPageState
   // ================= BERANDA =================
   Widget buildBeranda() {
 
-    return RefreshIndicator(
+    return ListView(
 
-      onRefresh:
-          fetchSetoranKhataman,
+      padding:
+          const EdgeInsets.all(
+              16),
 
-      child: ListView(
-        padding:
-            const EdgeInsets.all(
-                16),
+      children: [
 
-        children: [
+        // ================= HEADER =================
+        Container(
 
-          // ================= HEADER =================
-          Container(
-            padding:
-                const EdgeInsets.all(
-                    20),
+          padding:
+              const EdgeInsets.all(
+                  20),
 
-            decoration:
-                BoxDecoration(
-              color:
-                  Colors.lime[400],
+          decoration:
+              BoxDecoration(
 
-              borderRadius:
-                  BorderRadius.circular(
-                      24),
-            ),
+            color:
+                Colors.lime[400],
 
-            child: Row(
-              children: [
-
-                CircleAvatar(
-                  radius: 28,
-                  backgroundColor:
-                      Colors.white,
-
-                  child: const Icon(
-                    Icons.menu_book_rounded,
-                    size: 30,
-                    color: Colors.black,
-                  ),
-                ),
-
-                const SizedBox(
-                    width: 16),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
-
-                    children: [
-
-                      const Text(
-                        "Dashboard Pembimbing",
-                        style:
-                            TextStyle(
-                          fontSize: 18,
-                          fontWeight:
-                              FontWeight
-                                  .bold,
-                        ),
-                      ),
-
-                      const SizedBox(
-                          height: 4),
-
-                      Text(
-                        widget.marhalah,
-                        style:
-                            const TextStyle(
-                          fontSize: 15,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            borderRadius:
+                BorderRadius.circular(
+                    24),
           ),
 
-          const SizedBox(
-              height: 24),
+          child: Row(
 
-          // ================= INFO =================
-          Row(
             children: [
 
-              Expanded(
-                child: buildInfoCard(
-                  title:
-                      "Total Pengajuan",
-                  value:
-                      "${dataKhataman.length}",
-                  icon:
-                      Icons.assignment,
+              CircleAvatar(
+
+                radius: 28,
+
+                backgroundColor:
+                    Colors.white,
+
+                child: const Icon(
+                  Icons.menu_book_rounded,
+                  size: 30,
+                  color: Colors.black,
                 ),
               ),
 
               const SizedBox(
-                  width: 12),
+                  width: 16),
 
               Expanded(
-                child: buildInfoCard(
-                  title: "Pending",
 
-                  value:
-                      "${dataKhataman.where((e) => e['status'] == 'pending').length}",
+                child: Column(
 
-                  icon:
-                      Icons.access_time,
+                  crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
+                  children: [
+
+                    const Text(
+                      "Dashboard Pembimbing",
+                      style:
+                          TextStyle(
+                        fontSize: 18,
+                        fontWeight:
+                            FontWeight
+                                .bold,
+                      ),
+                    ),
+
+                    const SizedBox(
+                        height: 4),
+
+                    Text(
+                      widget.marhalah,
+                      style:
+                          const TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
+        ),
 
-          const SizedBox(
-              height: 24),
+        const SizedBox(
+            height: 24),
 
-          Row(
-            mainAxisAlignment:
-                MainAxisAlignment
-                    .spaceBetween,
+        // ================= MENU KHATAMAN =================
+        Container(
+
+          decoration:
+              BoxDecoration(
+
+            color: Colors.white,
+
+            borderRadius:
+                BorderRadius.circular(
+                    20),
+          ),
+
+          child: Column(
+
+            children: [
+
+              ListTile(
+
+                leading:
+                    const CircleAvatar(
+
+                  backgroundColor:
+                      Colors.orange,
+
+                  child: Icon(
+                    Icons
+                        .workspace_premium,
+                    color:
+                        Colors.white,
+                  ),
+                ),
+
+                title: const Text(
+                  "Data Setoran Khataman",
+                ),
+
+                subtitle:
+                    const Text(
+                  "Lihat data santri yang siap setoran",
+                ),
+
+                trailing:
+                    const Icon(
+                  Icons
+                      .arrow_forward_ios,
+                  size: 18,
+                ),
+
+                onTap: () {
+
+                  Navigator.push(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder: (_) =>
+                          DataKhatamanPage(
+
+                        marhalah:
+                            widget.marhalah,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(
+            height: 20),
+
+        // ================= INFO =================
+        Container(
+
+          padding:
+              const EdgeInsets.all(
+                  20),
+
+          decoration:
+              BoxDecoration(
+
+            color: Colors.white,
+
+            borderRadius:
+                BorderRadius.circular(
+                    20),
+          ),
+
+          child: Column(
+
+            crossAxisAlignment:
+                CrossAxisAlignment
+                    .start,
 
             children: [
 
               const Text(
-                "Setoran Khataman",
+
+                "Informasi",
+
                 style: TextStyle(
+
                   fontSize: 18,
+
                   fontWeight:
                       FontWeight.bold,
                 ),
               ),
 
-              IconButton(
-                onPressed:
-                    showSantriKhatamDialog,
+              const SizedBox(
+                  height: 14),
 
-                icon: const Icon(
-                  Icons
-                      .add_circle_outline,
-                ),
+              Row(
+
+                children: [
+
+                  Expanded(
+
+                    child:
+                        buildInfoCard(
+
+                      title:
+                          "Marhalah",
+
+                      value:
+                          widget.marhalah,
+
+                      icon:
+                          Icons.school,
+                    ),
+                  ),
+
+                  const SizedBox(
+                      width: 12),
+
+                  Expanded(
+
+                    child:
+                        buildInfoCard(
+
+                      title:
+                          "Pembimbing",
+
+                      value:
+                          namaPembimbing
+                                  .isEmpty
+                              ? widget
+                                  .username
+                              : namaPembimbing,
+
+                      icon:
+                          Icons.person,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-
-          const SizedBox(
-              height: 10),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   // ================= INFO CARD =================
   Widget buildInfoCard({
+
     required String title,
     required String value,
     required IconData icon,
+
   }) {
 
     return Container(
 
       padding:
           const EdgeInsets.all(
-              18),
+              16),
 
-      decoration: BoxDecoration(
-        color: Colors.white,
+      decoration:
+          BoxDecoration(
+
+        color:
+            Colors.grey[100],
 
         borderRadius:
             BorderRadius.circular(
-                20),
+                18),
       ),
 
       child: Column(
+
         children: [
 
-          Icon(icon, size: 30),
+          Icon(
+            icon,
+            size: 30,
+          ),
 
           const SizedBox(
               height: 10),
 
           Text(
+
             value,
-            style: const TextStyle(
-              fontSize: 22,
+
+            textAlign:
+                TextAlign.center,
+
+            style:
+                const TextStyle(
+
               fontWeight:
                   FontWeight.bold,
+
+              fontSize: 16,
             ),
           ),
 
           const SizedBox(
-              height: 4),
+              height: 6),
 
           Text(title),
         ],
       ),
     );
   }
-
-  // ================= DIALOG =================
-  void showSantriKhatamDialog()
-      async {}
 
   // ================= UI =================
   @override
@@ -513,13 +559,16 @@ class _DashboardPageState
           Colors.grey[300],
 
       appBar: AppBar(
+
         backgroundColor:
             Colors.grey[300],
 
         elevation: 0,
 
         title: Text(
+
           _getTitle(),
+
           style:
               const TextStyle(
             color: Colors.black,
@@ -532,16 +581,22 @@ class _DashboardPageState
 
         shape:
             const RoundedRectangleBorder(
+
           borderRadius:
               BorderRadius.only(
+
             topRight:
-                Radius.circular(20),
+                Radius.circular(
+                    20),
+
             bottomRight:
-                Radius.circular(20),
+                Radius.circular(
+                    20),
           ),
         ),
 
         child: Column(
+
           crossAxisAlignment:
               CrossAxisAlignment
                   .stretch,
@@ -557,23 +612,31 @@ class _DashboardPageState
               ),
 
               accountName: Text(
+
                 namaPembimbing
                         .isEmpty
                     ? widget.username
                     : namaPembimbing,
 
-                style: const TextStyle(
-                  color: Colors.black,
+                style:
+                    const TextStyle(
+
+                  color:
+                      Colors.black,
+
                   fontWeight:
                       FontWeight.bold,
                 ),
               ),
 
               accountEmail: Text(
+
                 'Marhalah: ${widget.marhalah}',
 
-                style: const TextStyle(
-                  color: Colors.black87,
+                style:
+                    const TextStyle(
+                  color:
+                      Colors.black87,
                 ),
               ),
 
@@ -584,9 +647,13 @@ class _DashboardPageState
                     Colors.white,
 
                 child: Icon(
+
                   Icons.person,
+
                   size: 40,
-                  color: Colors.black,
+
+                  color:
+                      Colors.black,
                 ),
               ),
             ),
@@ -610,9 +677,11 @@ class _DashboardPageState
                     context);
 
                 await Navigator.push(
+
                   context,
 
                   MaterialPageRoute(
+
                     builder: (_) =>
                         ProfilPage(
 
@@ -658,13 +727,19 @@ class _DashboardPageState
                 Navigator.pop(context);
 
                 Navigator.push(
+
                   context,
 
                   MaterialPageRoute(
+
                     builder: (_) =>
                         SetoranCadanganPage(
-                      username: widget.username,
-                      marhalah: widget.marhalah,
+
+                      username:
+                          widget.username,
+
+                      marhalah:
+                          widget.marhalah,
                     ),
                   ),
                 );
@@ -678,17 +753,19 @@ class _DashboardPageState
 
               leading:
                   const Icon(
+
                 Icons.logout,
+
                 color: Colors.red,
               ),
 
               title:
                   const Text(
+
                 'Logout',
 
                 style: TextStyle(
-                  color:
-                      Colors.red,
+                  color: Colors.red,
                 ),
               ),
 
@@ -702,40 +779,24 @@ class _DashboardPageState
       body: _pages[
           _selectedIndex],
 
-      // ================= FLOAT =================
-      floatingActionButton:
-          _selectedIndex == 0
-              ? FloatingActionButton(
-                  backgroundColor:
-                      Colors.lime[400],
-
-                  onPressed:
-                      showSantriKhatamDialog,
-
-                  child:
-                      const Icon(
-                    Icons.add,
-                    color:
-                        Colors.black,
-                  ),
-                )
-              : null,
-
       // ================= BOTTOM NAV =================
       bottomNavigationBar:
           Container(
 
         decoration:
             BoxDecoration(
+
           color:
               Colors.lime[400],
 
           borderRadius:
               const BorderRadius
                   .only(
+
             topLeft:
                 Radius.circular(
                     20),
+
             topRight:
                 Radius.circular(
                     20),
@@ -744,6 +805,7 @@ class _DashboardPageState
 
         child:
             BottomNavigationBar(
+
           backgroundColor:
               Colors.transparent,
 
@@ -768,29 +830,37 @@ class _DashboardPageState
           items: const [
 
             BottomNavigationBarItem(
+
               icon:
                   Icon(Icons.home),
+
               label:
                   'Beranda',
             ),
 
             BottomNavigationBarItem(
+
               icon: Icon(
                   Icons.book_online),
+
               label:
                   'Catat',
             ),
 
             BottomNavigationBarItem(
+
               icon: Icon(
                   Icons.history),
+
               label:
                   'Riwayat',
             ),
 
             BottomNavigationBarItem(
+
               icon:
                   Icon(Icons.book),
+
               label:
                   'Santri',
             ),
