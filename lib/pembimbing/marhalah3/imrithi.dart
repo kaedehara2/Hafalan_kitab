@@ -29,121 +29,15 @@ class _ImrithiPageState
 
   List<Map<String, dynamic>> riwayatHafalan = [];
 
-  Map<String, dynamic>? selectedBab;
-
-  final TextEditingController baitAwalController =
+  final TextEditingController
+      keteranganController =
       TextEditingController();
 
-  final TextEditingController baitAkhirController =
+  final TextEditingController
+      jumlahBaitController =
       TextEditingController();
 
   String? penilaian;
-
-  // ================= DATA BAB IMRITHI =================
-  final List<Map<String, dynamic>> babList = [
-
-    {
-      "nama": "Muqoddimah",
-      "awal": 1,
-      "akhir": 16,
-    },
-
-    {
-      "nama": "Bab Al-Kalam",
-      "awal": 17,
-      "akhir": 26,
-    },
-
-    {
-      "nama": "Bab Al-I'rab",
-      "awal": 27,
-      "akhir": 35,
-    },
-
-    {
-      "nama": "Bab Alamatul I'rab",
-      "awal": 36,
-      "akhir": 70,
-    },
-
-    {
-      "nama": "Bab Al-Af'al",
-      "awal": 71,
-      "akhir": 84,
-    },
-
-    {
-      "nama": "Bab Al-Af'al Fi'li",
-      "awal": 85,
-      "akhir": 100,
-    },
-
-    {
-      "nama": "Bab Isim-Isim",
-      "awal": 101,
-      "akhir": 104,
-    },
-
-    {
-      "nama": "Bab Al-Fa'il",
-      "awal": 105,
-      "akhir": 114,
-    },
-
-    {
-      "nama": "Bab Naibul Fa'il",
-      "awal": 115,
-      "akhir": 121,
-    },
-
-    {
-      "nama": "Bab Mubtada Wa Khabar",
-      "awal": 122,
-      "akhir": 136,
-    },
-
-    {
-      "nama": "Bab Inna Wa Akhwatuha",
-      "awal": 137,
-      "akhir": 146,
-    },
-
-    {
-      "nama": "Bab Kana Wa Akhwatuha",
-      "awal": 147,
-      "akhir": 155,
-    },
-
-    {
-      "nama": "Bab Dzonna",
-      "awal": 156,
-      "akhir": 161,
-    },
-
-    {
-      "nama": "Bab At-Tabi'",
-      "awal": 162,
-      "akhir": 188,
-    },
-
-    {
-      "nama": "Bab Isim-Isim Manshub",
-      "awal": 189,
-      "akhir": 230,
-    },
-
-    {
-      "nama": "Bab Isim-Isim Makhfudh",
-      "awal": 231,
-      "akhir": 249,
-    },
-
-    {
-      "nama": "Khotimah",
-      "awal": 250,
-      "akhir": 254,
-    },
-  ];
 
   @override
   void initState() {
@@ -244,7 +138,7 @@ class _ImrithiPageState
 
           .from('hafalan_santri')
 
-          .select('bagian_awal, bagian_akhir')
+          .select('jumlah_bait')
 
           .eq('santri_id', santriId)
 
@@ -254,13 +148,13 @@ class _ImrithiPageState
 
       for (var item in data) {
 
-        final awal =
-            int.tryParse(item['bagian_awal'].toString()) ?? 0;
+        final jumlah =
+            int.tryParse(
+              item['jumlah_bait'].toString(),
+            ) ??
+            0;
 
-        final akhir =
-            int.tryParse(item['bagian_akhir'].toString()) ?? 0;
-
-        totalBait += (akhir - awal) + 1;
+        totalBait += jumlah;
       }
 
       double progress =
@@ -281,46 +175,16 @@ class _ImrithiPageState
   // ================= INSERT HAFALAN =================
   Future<void> insertHafalan(int santriId) async {
 
-    if (selectedBab == null ||
-        penilaian == null ||
-        baitAwalController.text.isEmpty ||
-        baitAkhirController.text.isEmpty) {
+    if (keteranganController.text.isEmpty ||
+        jumlahBaitController.text.isEmpty ||
+        penilaian == null) {
       return;
     }
 
     try {
 
-      int baitAwal =
-          int.parse(baitAwalController.text);
-
-      int baitAkhir =
-          int.parse(baitAkhirController.text);
-
-      int batasAwal = selectedBab!['awal'];
-      int batasAkhir = selectedBab!['akhir'];
-
-      // ================= VALIDASI =================
-      if (baitAwal < batasAwal ||
-          baitAkhir > batasAkhir ||
-          baitAwal > baitAkhir) {
-
-        ScaffoldMessenger.of(context).showSnackBar(
-
-          SnackBar(
-
-            backgroundColor: Colors.red,
-
-            content: Text(
-              "Rentang bait tidak sesuai dengan bab",
-            ),
-          ),
-        );
-
-        return;
-      }
-
-      final bagianText =
-          "${selectedBab!['nama']} ($baitAwal - $baitAkhir)";
+      final jumlahBait =
+          int.parse(jumlahBaitController.text);
 
       await supabase.from('hafalan_santri').insert({
 
@@ -328,11 +192,10 @@ class _ImrithiPageState
 
         'kitab': 'imrithi',
 
-        'bagian_awal': baitAwal.toString(),
+        'bagian':
+            keteranganController.text,
 
-        'bagian_akhir': baitAkhir.toString(),
-
-        'bagian': bagianText,
+        'jumlah_bait': jumlahBait,
 
         'status': penilaian,
 
@@ -350,11 +213,9 @@ class _ImrithiPageState
 
       setState(() {
 
-        selectedBab = null;
+        keteranganController.clear();
 
-        baitAwalController.clear();
-
-        baitAkhirController.clear();
+        jumlahBaitController.clear();
 
         penilaian = null;
       });
@@ -636,14 +497,21 @@ class _ImrithiPageState
 
           const SizedBox(height: 20),
 
-          // ================= PILIH BAB =================
-          DropdownButtonFormField<Map<String, dynamic>>(
+          // ================= KETERANGAN =================
+          TextField(
 
-            value: selectedBab,
+            controller:
+                keteranganController,
+
+            maxLines: 4,
 
             decoration: InputDecoration(
 
-              labelText: "Pilih Bab",
+              labelText:
+                  "Keterangan Hafalan",
+
+              hintText:
+                  "Contoh:\nBab Al-Kalam sampai Bab I'rab",
 
               border: OutlineInputBorder(
 
@@ -651,63 +519,26 @@ class _ImrithiPageState
                     BorderRadius.circular(14),
               ),
             ),
-
-            items: babList.map((bab) {
-
-              return DropdownMenuItem(
-
-                value: bab,
-
-                child: Text(
-                  bab['nama'],
-                ),
-              );
-            }).toList(),
-
-            onChanged: (v) {
-
-              setState(() {
-
-                selectedBab = v;
-              });
-            },
           ),
 
           const SizedBox(height: 20),
 
-          // ================= BAIT AWAL =================
+          // ================= JUMLAH BAIT =================
           TextField(
 
-            controller: baitAwalController,
+            controller:
+                jumlahBaitController,
 
             keyboardType:
                 TextInputType.number,
 
             decoration: InputDecoration(
 
-              labelText: "Bait Awal",
+              labelText:
+                  "Jumlah Bait",
 
-              border: OutlineInputBorder(
-
-                borderRadius:
-                    BorderRadius.circular(14),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // ================= BAIT AKHIR =================
-          TextField(
-
-            controller: baitAkhirController,
-
-            keyboardType:
-                TextInputType.number,
-
-            decoration: InputDecoration(
-
-              labelText: "Bait Akhir",
+              hintText:
+                  "Masukkan jumlah bait",
 
               border: OutlineInputBorder(
 
@@ -739,7 +570,8 @@ class _ImrithiPageState
 
                   value: "Lancar",
 
-                  groupValue: penilaian,
+                  groupValue:
+                      penilaian,
 
                   activeColor:
                       Colors.lime[700],
@@ -755,8 +587,8 @@ class _ImrithiPageState
 
                 RadioListTile(
 
-                  title:
-                      const Text("Kurang Lancar"),
+                  title: const Text(
+                      "Kurang Lancar"),
 
                   value:
                       "Kurang Lancar",
@@ -882,6 +714,10 @@ class _ImrithiPageState
 
                           DataColumn(
                               label:
+                                  Text("Jumlah")),
+
+                          DataColumn(
+                              label:
                                   Text("Status")),
 
                           DataColumn(
@@ -918,6 +754,12 @@ class _ImrithiPageState
 
                                 DataCell(
                                   Text(item['bagian']),
+                                ),
+
+                                DataCell(
+                                  Text(
+                                    "${item['jumlah_bait']} bait",
+                                  ),
                                 ),
 
                                 DataCell(
