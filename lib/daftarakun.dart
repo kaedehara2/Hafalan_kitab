@@ -224,6 +224,7 @@ class _DaftarAkunState extends State<DaftarAkun> {
                 'Marhalah 1',
                 'Marhalah 2',
                 'Marhalah 3',
+                'Marhalah 4',
               ]
                   .map(
                     (label) =>
