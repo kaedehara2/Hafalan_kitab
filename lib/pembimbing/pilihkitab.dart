@@ -167,7 +167,9 @@ class PilihKitabPage extends StatelessWidget {
 
                     MaterialPageRoute(
                       builder: (_) =>
-                          const MaqsudPage(),
+                          MaqsudPage(
+                            username: username,
+                          ),
                     ),
                   );
                 },
@@ -198,7 +200,9 @@ class PilihKitabPage extends StatelessWidget {
 
                     MaterialPageRoute(
                       builder: (_) =>
-                          const AlfiyahPage(),
+                           AlfiyahPage(
+                            username: username,
+                           ),
                     ),
                   );
                 },
