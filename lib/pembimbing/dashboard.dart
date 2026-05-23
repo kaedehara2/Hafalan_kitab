@@ -9,6 +9,10 @@ import 'package:hafalan_kitab/pembimbing/pilihkitab.dart';
 import 'riwayathafalan.dart';
 import 'setorancadangan.dart';
 import 'datakhataman.dart';
+import 'pencapaianhafalan/pencapaianhafalan1.dart';
+import 'pencapaianhafalan/pencapaianhafalan2.dart';
+import 'pencapaianhafalan/pencapaianhafalan3.dart';
+import 'pencapaianhafalan/pencapaianhafalan4.dart';
 
 class DashboardPage extends StatefulWidget {
 
@@ -743,6 +747,105 @@ class _DashboardPageState
                     ),
                   ),
                 );
+              },
+            ),
+
+            const Divider(),
+
+            // ================= PENCAPAIAN HAFALAN =================
+            ListTile(
+
+              leading: const Icon(
+                Icons.check_box,
+                color: Colors.green,
+              ),
+
+              title: const Text(
+                'Pencapaian Hafalan',
+              ),
+
+              onTap: () {
+
+                Navigator.pop(context);
+
+                // ================= MARHALAH 1 =================
+                if (widget.marhalah == 'Marhalah 1') {
+
+                  Navigator.push(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder: (_) =>
+                          PencapaianHafalan1Page(
+
+                        marhalah:
+                            widget.marhalah,
+                      ),
+                    ),
+                  );
+                }
+
+                // ================= MARHALAH 2 =================
+                else if (widget.marhalah ==
+                    'Marhalah 2') {
+
+                  Navigator.push(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder: (_) =>
+                          PencapaianHafalan2Page(
+
+                        marhalah:
+                            widget.marhalah,
+                      ),
+                    ),
+                  );
+                }
+
+                // ================= MARHALAH 3 =================
+                else if (widget.marhalah ==
+                    'Marhalah 3') {
+
+                  Navigator.push(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder: (_) =>
+                          PencapaianHafalan3Page(
+
+                        marhalah:
+                            widget.marhalah,
+                      ),
+                    ),
+                  );
+                }
+
+                // ================= MARHALAH 4 =================
+                else if (widget.marhalah ==
+                    'Marhalah 4') {
+
+                  Navigator.push(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder: (_) =>
+                          PencapaianHafalan4Page(
+
+                        marhalah:
+                            widget.marhalah,
+                      ),
+                    ),
+                  );
+                }
               },
             ),
 
