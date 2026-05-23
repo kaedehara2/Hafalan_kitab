@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class DataKhatamanPage extends StatefulWidget {
-
   final String marhalah;
 
   const DataKhatamanPage({
@@ -43,43 +42,58 @@ class _DataKhatamanPageState
 
     try {
 
+      // ================= AMBIL DATA KHATAMAN =================
       final data = await supabase
           .from('setoran_khataman')
-          .select('''
-            id,
-            kitab,
-            status,
-            tanggal_pengajuan,
-            tanggal_setoran,
-            status_jadwal,
-            jadwal_setoran,
-            santri (
-              nama_lengkap,
-              kelas,
-              marhalah
-            )
-          ''')
-          .eq(
-            'santri.marhalah',
-            widget.marhalah,
-          )
+          .select()
           .order(
             'tanggal_pengajuan',
             ascending: false,
           );
 
+      List<Map<String, dynamic>>
+          hasil = [];
+
+      // ================= FILTER BERDASARKAN MARHALAH =================
+      for (var item in data) {
+
+        final santriId =
+            item['santri_id'];
+
+        final santriData =
+            await supabase
+                .from('santri')
+                .select(
+                    'nama_lengkap, kelas, marhalah')
+                .eq('id', santriId)
+                .maybeSingle();
+
+        // ================= CEK MARHALAH =================
+        if (santriData != null &&
+            santriData['marhalah'] ==
+                widget.marhalah) {
+
+          hasil.add({
+
+            ...item,
+
+            'santri': santriData,
+          });
+        }
+      }
+
       if (!mounted) return;
 
       setState(() {
 
-        dataKhataman =
-            List<Map<String,
-                dynamic>>.from(data);
+        dataKhataman = hasil;
 
         loading = false;
       });
 
     } catch (e) {
+
+      if (!mounted) return;
 
       setState(() {
         loading = false;
@@ -114,6 +128,29 @@ class _DataKhatamanPageState
 
       default:
         return Colors.grey;
+    }
+  }
+
+  // ================= FORMAT TANGGAL =================
+  String formatTanggal(
+      dynamic tanggal) {
+
+    if (tanggal == null) {
+      return "-";
+    }
+
+    try {
+
+      final tgl =
+          DateTime.parse(
+              tanggal.toString());
+
+      return
+          "${tgl.day}/${tgl.month}/${tgl.year}";
+
+    } catch (e) {
+
+      return "-";
     }
   }
 
@@ -172,7 +209,7 @@ class _DataKhatamanPageState
                           dataKhataman[i];
 
                       final santri =
-                          item['santri'];
+                          item['santri'] ?? {};
 
                       return Container(
 
@@ -192,6 +229,23 @@ class _DataKhatamanPageState
                           borderRadius:
                               BorderRadius.circular(
                                   20),
+
+                          boxShadow: [
+
+                            BoxShadow(
+
+                              color:
+                                  Colors.black
+                                      .withOpacity(
+                                          0.05),
+
+                              blurRadius: 8,
+
+                              offset:
+                                  const Offset(
+                                      0, 4),
+                            ),
+                          ],
                         ),
 
                         child: Column(
@@ -202,6 +256,7 @@ class _DataKhatamanPageState
 
                           children: [
 
+                            // ================= HEADER =================
                             Row(
 
                               children: [
@@ -235,7 +290,8 @@ class _DataKhatamanPageState
                                       Text(
 
                                         santri[
-                                            'nama_lengkap'],
+                                                'nama_lengkap'] ??
+                                            '-',
 
                                         style:
                                             const TextStyle(
@@ -248,9 +304,13 @@ class _DataKhatamanPageState
                                         ),
                                       ),
 
+                                      const SizedBox(
+                                          height: 2),
+
                                       Text(
                                         santri[
-                                            'kelas'],
+                                                'kelas'] ??
+                                            '-',
                                       ),
                                     ],
                                   ),
@@ -261,6 +321,7 @@ class _DataKhatamanPageState
                             const SizedBox(
                                 height: 18),
 
+                            // ================= KITAB =================
                             Row(
 
                               children: [
@@ -273,15 +334,29 @@ class _DataKhatamanPageState
                                 const SizedBox(
                                     width: 8),
 
-                                Text(
-                                  item['kitab'],
+                                Expanded(
+
+                                  child: Text(
+
+                                    item['kitab']
+                                            ?.toString()
+                                            .toUpperCase() ??
+                                        '-',
+
+                                    style:
+                                        const TextStyle(
+                                      fontWeight:
+                                          FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
 
                             const SizedBox(
-                                height: 10),
+                                height: 12),
 
+                            // ================= STATUS =================
                             Row(
 
                               children: [
@@ -307,7 +382,8 @@ class _DataKhatamanPageState
 
                                     color:
                                         getStatusColor(
-                                      item['status'],
+                                      item['status'] ??
+                                          'pending',
                                     ),
 
                                     borderRadius:
@@ -317,7 +393,8 @@ class _DataKhatamanPageState
 
                                   child: Text(
 
-                                    item['status'],
+                                    item['status'] ??
+                                        '-',
 
                                     style:
                                         const TextStyle(
@@ -332,15 +409,76 @@ class _DataKhatamanPageState
                             ),
 
                             const SizedBox(
-                                height: 10),
+                                height: 12),
 
+                            // ================= TANGGAL PENGAJUAN =================
+                            Text(
+                              "Tanggal Pengajuan : ${formatTanggal(item['tanggal_pengajuan'])}",
+                            ),
+
+                            const SizedBox(
+                                height: 8),
+
+                            // ================= TANGGAL SETORAN =================
                             if (item[
-                                    'jadwal_setoran'] !=
+                                    'tanggal_setoran'] !=
                                 null)
 
                               Text(
-                                "Jadwal Setoran : ${item['jadwal_setoran']}",
+                                "Tanggal Setoran : ${formatTanggal(item['tanggal_setoran'])}",
                               ),
+
+                            // ================= JADWAL =================
+                            if (item[
+                                    'jadwal_setoran'] !=
+                                null) ...[
+
+                              const SizedBox(
+                                  height: 8),
+
+                              Text(
+                                "Jadwal Setoran : ${formatTanggal(item['jadwal_setoran'])}",
+                              ),
+                            ],
+
+                            // ================= CATATAN ADMIN =================
+                            if (item[
+                                    'catatan_admin'] !=
+                                null &&
+                                item['catatan_admin']
+                                    .toString()
+                                    .isNotEmpty) ...[
+
+                              const SizedBox(
+                                  height: 10),
+
+                              Container(
+
+                                width:
+                                    double.infinity,
+
+                                padding:
+                                    const EdgeInsets
+                                        .all(12),
+
+                                decoration:
+                                    BoxDecoration(
+
+                                  color:
+                                      Colors.grey[
+                                          100],
+
+                                  borderRadius:
+                                      BorderRadius
+                                          .circular(
+                                              12),
+                                ),
+
+                                child: Text(
+                                  "Catatan Admin : ${item['catatan_admin']}",
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       );
