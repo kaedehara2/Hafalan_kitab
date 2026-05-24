@@ -3,6 +3,7 @@ import 'package:hafalan_kitab/pembimbing/dashboard.dart';
 import 'package:hafalan_kitab/admin/dashboardadmin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'daftarakun.dart';
+import 'package:hafalan_kitab/walisantri/dashboardwali.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -12,6 +13,8 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+
+    final supabase = Supabase.instance.client;
 
   final TextEditingController usernameController =
       TextEditingController();
@@ -144,6 +147,34 @@ class _LoginState extends State<Login> {
         }
 
       } else {
+
+        // ================= LOGIN WALI SANTRI =================
+        final wali = await supabase
+            .from('wali_santri')
+            .select()
+            .eq('username', usernameController.text)
+            .eq('password', passwordController.text)
+            .maybeSingle();
+
+        if (wali != null) {
+
+          Navigator.pushReplacement(
+
+            context,
+
+            MaterialPageRoute(
+
+              builder: (_) => DashboardWaliPage(
+
+                waliId: wali['id'].toString(),
+
+                namaWali: wali['nama_wali'],
+              ),
+            ),
+          );
+
+          return;
+        }
 
         ScaffoldMessenger.of(context)
             .showSnackBar(
