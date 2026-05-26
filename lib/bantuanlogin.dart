@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'resetakunpembimbing.dart';
 
 class BantuanLoginPage extends StatefulWidget {
   const BantuanLoginPage({super.key});
@@ -214,18 +215,18 @@ class _BantuanLoginPageState
                     return;
                   }
 
-                  // ================= PEMBIMBING =================
+                 // ================= PEMBIMBING =================
                   if (selectedRole ==
                       'Pembimbing') {
 
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(
+                    Navigator.push(
 
-                      const SnackBar(
+                      context,
 
-                        content: Text(
-                          'Menu reset pembimbing akan dibuat selanjutnya',
-                        ),
+                      MaterialPageRoute(
+
+                        builder: (_) =>
+                            const ResetAkunPembimbingPage(),
                       ),
                     );
                   }
