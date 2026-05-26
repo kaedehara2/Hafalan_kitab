@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'resetakunpembimbing.dart';
 
 class BantuanLoginPage extends StatefulWidget {
-  const BantuanLoginPage({super.key});
+
+  const BantuanLoginPage({
+    super.key,
+  });
 
   @override
   State<BantuanLoginPage> createState() =>
@@ -14,12 +19,54 @@ class _BantuanLoginPageState
 
   String selectedRole = '';
 
+  // ================= WHATSAPP =================
+  Future<void> bukaWhatsApp({
+    required String pesan,
+  }) async {
+
+    // ================= NOMOR DEVELOPER =================
+    final nomorDeveloper =
+        '62895398355567';
+
+    final url = Uri.parse(
+
+      'https://wa.me/$nomorDeveloper?text=${Uri.encodeComponent(pesan)}',
+    );
+
+    if (await canLaunchUrl(url)) {
+
+      await launchUrl(
+
+        url,
+
+        mode:
+            LaunchMode.externalApplication,
+      );
+
+    } else {
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+
+        const SnackBar(
+
+          content: Text(
+            'WhatsApp tidak dapat dibuka',
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
 
-      backgroundColor: Colors.grey[200],
+      backgroundColor:
+          Colors.grey[200],
 
       appBar: AppBar(
 
@@ -27,17 +74,20 @@ class _BantuanLoginPageState
           'Bantuan Login',
         ),
 
-        backgroundColor: Colors.lime[400],
+        backgroundColor:
+            Colors.lime[400],
       ),
 
       body: Padding(
 
-        padding: const EdgeInsets.all(20),
+        padding:
+            const EdgeInsets.all(20),
 
         child: Column(
 
           crossAxisAlignment:
-              CrossAxisAlignment.start,
+              CrossAxisAlignment
+                  .start,
 
           children: [
 
@@ -50,7 +100,8 @@ class _BantuanLoginPageState
 
                 fontSize: 22,
 
-                fontWeight: FontWeight.bold,
+                fontWeight:
+                    FontWeight.bold,
               ),
             ),
 
@@ -70,31 +121,40 @@ class _BantuanLoginPageState
             // ================= PEMBIMBING =================
             Card(
 
-              shape: RoundedRectangleBorder(
+              shape:
+                  RoundedRectangleBorder(
+
                 borderRadius:
-                    BorderRadius.circular(18),
+                    BorderRadius.circular(
+                        18),
               ),
 
               child: RadioListTile(
 
                 value: 'Pembimbing',
 
-                groupValue: selectedRole,
+                groupValue:
+                    selectedRole,
 
                 title: const Text(
                   'Pembimbing',
                 ),
 
-                secondary: const Icon(
+                secondary:
+                    const Icon(
+
                   Icons.school,
-                  color: Colors.green,
+
+                  color:
+                      Colors.green,
                 ),
 
                 onChanged: (value) {
 
                   setState(() {
 
-                    selectedRole = value!;
+                    selectedRole =
+                        value!;
                   });
                 },
               ),
@@ -105,31 +165,41 @@ class _BantuanLoginPageState
             // ================= ADMIN =================
             Card(
 
-              shape: RoundedRectangleBorder(
+              shape:
+                  RoundedRectangleBorder(
+
                 borderRadius:
-                    BorderRadius.circular(18),
+                    BorderRadius.circular(
+                        18),
               ),
 
               child: RadioListTile(
 
                 value: 'Admin',
 
-                groupValue: selectedRole,
+                groupValue:
+                    selectedRole,
 
                 title: const Text(
                   'Admin',
                 ),
 
-                secondary: const Icon(
-                  Icons.admin_panel_settings,
-                  color: Colors.orange,
+                secondary:
+                    const Icon(
+
+                  Icons
+                      .admin_panel_settings,
+
+                  color:
+                      Colors.orange,
                 ),
 
                 onChanged: (value) {
 
                   setState(() {
 
-                    selectedRole = value!;
+                    selectedRole =
+                        value!;
                   });
                 },
               ),
@@ -140,31 +210,41 @@ class _BantuanLoginPageState
             // ================= WALI SANTRI =================
             Card(
 
-              shape: RoundedRectangleBorder(
+              shape:
+                  RoundedRectangleBorder(
+
                 borderRadius:
-                    BorderRadius.circular(18),
+                    BorderRadius.circular(
+                        18),
               ),
 
               child: RadioListTile(
 
                 value: 'Wali Santri',
 
-                groupValue: selectedRole,
+                groupValue:
+                    selectedRole,
 
                 title: const Text(
                   'Wali Santri',
                 ),
 
-                secondary: const Icon(
-                  Icons.family_restroom,
-                  color: Colors.blue,
+                secondary:
+                    const Icon(
+
+                  Icons
+                      .family_restroom,
+
+                  color:
+                      Colors.blue,
                 ),
 
                 onChanged: (value) {
 
                   setState(() {
 
-                    selectedRole = value!;
+                    selectedRole =
+                        value!;
                   });
                 },
               ),
@@ -175,13 +255,16 @@ class _BantuanLoginPageState
             // ================= BUTTON =================
             SizedBox(
 
-              width: double.infinity,
+              width:
+                  double.infinity,
 
               height: 55,
 
               child: ElevatedButton(
 
-                style: ElevatedButton.styleFrom(
+                style:
+                    ElevatedButton
+                        .styleFrom(
 
                   backgroundColor:
                       Colors.lime[400],
@@ -189,19 +272,24 @@ class _BantuanLoginPageState
                   foregroundColor:
                       Colors.black,
 
-                  shape: RoundedRectangleBorder(
+                  shape:
+                      RoundedRectangleBorder(
 
                     borderRadius:
-                        BorderRadius.circular(18),
+                        BorderRadius
+                            .circular(
+                                18),
                   ),
                 ),
 
                 onPressed: () {
 
                   // ================= VALIDASI =================
-                  if (selectedRole.isEmpty) {
+                  if (selectedRole
+                      .isEmpty) {
 
-                    ScaffoldMessenger.of(context)
+                    ScaffoldMessenger.of(
+                            context)
                         .showSnackBar(
 
                       const SnackBar(
@@ -215,7 +303,7 @@ class _BantuanLoginPageState
                     return;
                   }
 
-                 // ================= PEMBIMBING =================
+                  // ================= PEMBIMBING =================
                   if (selectedRole ==
                       'Pembimbing') {
 
@@ -235,79 +323,21 @@ class _BantuanLoginPageState
                   else if (selectedRole ==
                       'Admin') {
 
-                    showDialog(
+                    bukaWhatsApp(
 
-                      context: context,
-
-                      builder: (_) {
-
-                        return AlertDialog(
-
-                          title: const Text(
-                            'Bantuan Admin',
-                          ),
-
-                          content: const Text(
-                            'Silakan hubungi developer untuk pemulihan akun admin.',
-                          ),
-
-                          actions: [
-
-                            TextButton(
-
-                              onPressed: () {
-
-                                Navigator.pop(
-                                    context);
-                              },
-
-                              child: const Text(
-                                'Tutup',
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                      pesan:
+                          'Assalamu\'alaikum developer, saya admin aplikasi Hafalku mengalami lupa username/password dan membutuhkan bantuan pemulihan akun.',
                     );
                   }
 
-                  // ================= WALI =================
+                  // ================= WALI SANTRI =================
                   else if (selectedRole ==
                       'Wali Santri') {
 
-                    showDialog(
+                    bukaWhatsApp(
 
-                      context: context,
-
-                      builder: (_) {
-
-                        return AlertDialog(
-
-                          title: const Text(
-                            'Bantuan Wali Santri',
-                          ),
-
-                          content: const Text(
-                            'Silakan hubungi developer untuk bantuan login wali santri.',
-                          ),
-
-                          actions: [
-
-                            TextButton(
-
-                              onPressed: () {
-
-                                Navigator.pop(
-                                    context);
-                              },
-
-                              child: const Text(
-                                'Tutup',
-                              ),
-                            ),
-                          ],
-                        );
-                      },
+                      pesan:
+                          'Assalamu\'alaikum developer, saya wali santri aplikasi Hafalku mengalami lupa username/password dan membutuhkan bantuan login.',
                     );
                   }
                 },
@@ -317,8 +347,11 @@ class _BantuanLoginPageState
                   'Lanjutkan',
 
                   style: TextStyle(
+
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+
+                    fontWeight:
+                        FontWeight.bold,
                   ),
                 ),
               ),
