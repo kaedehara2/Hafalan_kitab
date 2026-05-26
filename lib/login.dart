@@ -4,6 +4,7 @@ import 'package:hafalan_kitab/admin/dashboardadmin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'daftarakun.dart';
 import 'package:hafalan_kitab/walisantri/dashboardwali.dart';
+import 'bantuanlogin.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -330,17 +331,35 @@ class _LoginState extends State<Login> {
                 ),
               ),
 
-              // ================= LUPA PASSWORD =================
-              TextButton(
+              // ================= LUPA USERNAME PASSWORD =================
+                TextButton(
 
-                onPressed: () {},
+                  onPressed: () {
 
-                child: const Text(
-                  'Lupa password',
+                    Navigator.push(
+
+                      context,
+
+                      MaterialPageRoute(
+
+                        builder: (_) =>
+                            const BantuanLoginPage(),
+                      ),
+                    );
+                  },
+
+                  child: const Text(
+
+                    'Lupa Username/Password?',
+
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
               // ================= DAFTAR =================
               Row(
