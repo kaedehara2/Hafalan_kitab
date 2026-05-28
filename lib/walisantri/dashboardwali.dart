@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'monitoringhafalan.dart';
 import 'riwayatkhataman.dart';
+import 'package:hafalan_kitab/login.dart';
 
 class DashboardWaliPage extends StatefulWidget {
 
@@ -32,6 +33,86 @@ class _DashboardWaliPageState
 
   List<Map<String, dynamic>>
       progressKitab = [];
+
+        // ================= LOGOUT =================
+  Future<void> logout() async {
+
+    final konfirmasi =
+        await showDialog<bool>(
+
+      context: context,
+
+      builder: (dialogContext) {
+
+        return AlertDialog(
+
+          title: const Text(
+            'Konfirmasi Logout',
+          ),
+
+          content: const Text(
+            'Apakah Anda yakin ingin logout?',
+          ),
+
+          actions: [
+
+            TextButton(
+
+              onPressed: () {
+
+                Navigator.pop(
+                  dialogContext,
+                  false,
+                );
+              },
+
+              child: const Text(
+                'Batal',
+              ),
+            ),
+
+            ElevatedButton(
+
+              style:
+                  ElevatedButton.styleFrom(
+                backgroundColor:
+                    Colors.red,
+              ),
+
+              onPressed: () {
+
+                Navigator.pop(
+                  dialogContext,
+                  true,
+                );
+              },
+
+              child: const Text(
+                'Logout',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    // ================= PINDAH LOGIN =================
+    if (konfirmasi == true) {
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+
+        context,
+
+        MaterialPageRoute(
+          builder: (_) => Login(),
+        ),
+
+        (route) => false,
+      );
+    }
+  }
 
   @override
   void initState() {
@@ -102,31 +183,69 @@ class _DashboardWaliPageState
   }
 
   // ================= LOAD PROGRESS =================
-  Future<void> loadProgressKitab(
-      int santriId) async {
+ 
+  // ================= LOAD PROGRESS =================
+Future<void> loadProgressKitab(
+    int santriId) async {
 
-    progressKitab.clear();
+  progressKitab.clear();
 
-    try {
+  try {
 
-      final hafalan = await supabase
+    final hafalan = await supabase
 
-          .from('hafalan_santri')
+        .from('hafalan_santri')
 
-          .select()
+        .select()
 
-          .eq(
-            'santri_id',
-            santriId,
-          );
+        .eq(
+          'santri_id',
+          santriId,
+        );
 
-      Map<String, int> total =
-          {};
+    Map<String, double> progressMap = {};
 
-      for (var item in hafalan) {
+    // ================= TOTAL BAIT =================
+    final totalKitab = {
 
-        final kitab =
-            item['kitab'];
+      'imrithi': 254,
+      'maqsud': 113,
+      'alfiyah': 1002,
+    };
+
+    for (var item in hafalan) {
+
+      final kitab =
+          item['kitab']
+              .toString()
+              .toLowerCase();
+
+      // ================= AWAMIL & JURUMIYAH =================
+      if (kitab == 'awamil' ||
+          kitab == 'jurumiyah') {
+
+        final nilai =
+            (item['nilai_progress'] ?? 0)
+                .toDouble();
+
+        // ambil progress terbesar
+        if (!progressMap.containsKey(kitab)) {
+
+          progressMap[kitab] = nilai;
+
+        } else {
+
+          if (nilai >
+              progressMap[kitab]!) {
+
+            progressMap[kitab] = nilai;
+          }
+        }
+      }
+
+      // ================= KITAB BAIT =================
+      else if (totalKitab.containsKey(
+          kitab)) {
 
         final jumlah =
             int.tryParse(
@@ -135,51 +254,51 @@ class _DashboardWaliPageState
                 ) ??
                 0;
 
-        total[kitab] =
-            (total[kitab] ?? 0) +
-                jumlah;
+        final current =
+            progressMap[kitab] ?? 0;
+
+        progressMap[kitab] =
+            current + jumlah;
+      }
+    }
+
+    // ================= HITUNG PERSEN BAIT =================
+    progressMap.forEach((
+      kitab,
+      value,
+    ) {
+
+      double progress = value;
+
+      if (totalKitab.containsKey(
+          kitab)) {
+
+        progress =
+            (value /
+                    totalKitab[
+                        kitab]!) *
+                100;
+
+        if (progress > 100) {
+
+          progress = 100;
+        }
       }
 
-      // ================= TOTAL BAIT =================
-      final totalKitab = {
+      progressKitab.add({
 
-        'imrithi': 254,
-        'maqsud': 113,
-        'alfiyah': 1002,
-      };
-
-      total.forEach((kitab, jumlah) {
-
-        double progress = 0;
-
-        if (totalKitab.containsKey(
-            kitab)) {
-
-          progress =
-              (jumlah /
-                      totalKitab[
-                          kitab]!) *
-                  100;
-
-          if (progress > 100) {
-            progress = 100;
-          }
-        }
-
-        progressKitab.add({
-
-          'kitab': kitab,
-          'progress': progress,
-        });
+        'kitab': kitab,
+        'progress': progress,
       });
+    });
 
-    } catch (e) {
+  } catch (e) {
 
-      debugPrint(
-        'Error progress: $e',
-      );
-    }
+    debugPrint(
+      'Error progress: $e',
+    );
   }
+}
 
   // ================= CARD =================
   Widget buildInfoCard({
@@ -285,13 +404,25 @@ class _DashboardWaliPageState
 
       appBar: AppBar(
 
-        backgroundColor:
-            Colors.lime[400],
+  backgroundColor:
+      Colors.lime[400],
 
-        title: const Text(
-          'Dashboard Wali Santri',
-        ),
+  title: const Text(
+    'Dashboard Wali Santri',
+  ),
+
+  actions: [
+
+    IconButton(
+
+      onPressed: logout,
+
+      icon: const Icon(
+        Icons.logout,
       ),
+    ),
+  ],
+),
 
       body: loading
 
