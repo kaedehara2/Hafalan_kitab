@@ -34,7 +34,7 @@ class _DashboardWaliPageState
   List<Map<String, dynamic>>
       progressKitab = [];
 
-        // ================= LOGOUT =================
+  // ================= LOGOUT =================
   Future<void> logout() async {
 
     final konfirmasi =
@@ -96,7 +96,6 @@ class _DashboardWaliPageState
       },
     );
 
-    // ================= PINDAH LOGIN =================
     if (konfirmasi == true) {
 
       if (!mounted) return;
@@ -182,9 +181,7 @@ class _DashboardWaliPageState
     }
   }
 
-  // ================= LOAD PROGRESS =================
- 
-  // ================= LOAD PROGRESS =================
+ // ================= LOAD PROGRESS =================
 Future<void> loadProgressKitab(
     int santriId) async {
 
@@ -203,15 +200,17 @@ Future<void> loadProgressKitab(
           santriId,
         );
 
-    Map<String, double> progressMap = {};
+    // ================= PENAMPUNG =================
+    Map<String, double>
+        totalProgress = {};
 
-    // ================= TOTAL BAIT =================
-    final totalKitab = {
+    // ================= NADZAM =================
+    Map<String, int>
+        totalBait = {};
 
-      'imrithi': 254,
-      'maqsud': 113,
-      'alfiyah': 1002,
-    };
+    // ================= NON NADZAM =================
+    Map<String, int>
+        totalSetoran = {};
 
     for (var item in hafalan) {
 
@@ -220,77 +219,113 @@ Future<void> loadProgressKitab(
               .toString()
               .toLowerCase();
 
-      // ================= AWAMIL & JURUMIYAH =================
-      if (kitab == 'awamil' ||
-          kitab == 'jurumiyah') {
+      // ================= KITAB NADZAM =================
+      if (kitab == 'imrithi' ||
+          kitab == 'maqsud' ||
+          kitab == 'alfiyah') {
 
-        final nilai =
-            (item['nilai_progress'] ?? 0)
-                .toDouble();
-
-        // ambil progress terbesar
-        if (!progressMap.containsKey(kitab)) {
-
-          progressMap[kitab] = nilai;
-
-        } else {
-
-          if (nilai >
-              progressMap[kitab]!) {
-
-            progressMap[kitab] = nilai;
-          }
-        }
-      }
-
-      // ================= KITAB BAIT =================
-      else if (totalKitab.containsKey(
-          kitab)) {
-
-        final jumlah =
+        final jumlahBait =
             int.tryParse(
                   item['jumlah_bait']
-                      .toString(),
+                          ?.toString() ??
+                      '0',
                 ) ??
                 0;
 
-        final current =
-            progressMap[kitab] ?? 0;
+        totalBait[kitab] =
+            (totalBait[kitab] ?? 0) +
+                jumlahBait;
+      }
 
-        progressMap[kitab] =
-            current + jumlah;
+      // ================= KITAB NON NADZAM =================
+      else {
+
+        totalSetoran[kitab] =
+            (totalSetoran[kitab] ?? 0) +
+                1;
       }
     }
 
-    // ================= HITUNG PERSEN BAIT =================
-    progressMap.forEach((
-      kitab,
-      value,
-    ) {
+    // ================= HITUNG NADZAM =================
+    totalBait.forEach(
+      (kitab, jumlah) {
 
-      double progress = value;
+        double progress = 0;
 
-      if (totalKitab.containsKey(
-          kitab)) {
+        if (kitab == 'imrithi') {
 
-        progress =
-            (value /
-                    totalKitab[
-                        kitab]!) *
-                100;
+          progress =
+              (jumlah / 254) * 100;
+        }
+
+        else if (kitab == 'maqsud') {
+
+          progress =
+              (jumlah / 113) * 100;
+        }
+
+        else if (kitab == 'alfiyah') {
+
+          progress =
+              (jumlah / 1002) * 100;
+        }
 
         if (progress > 100) {
-
           progress = 100;
         }
-      }
 
-      progressKitab.add({
+        totalProgress[kitab] =
+            progress;
+      },
+    );
 
-        'kitab': kitab,
-        'progress': progress,
-      });
-    });
+    // ================= HITUNG NON NADZAM =================
+    totalSetoran.forEach(
+      (kitab, jumlahSetoran) {
+
+        double progress = 0;
+
+        if (kitab == 'awamil') {
+
+          progress =
+              (jumlahSetoran / 100) *
+                  100;
+        }
+
+        else if (kitab ==
+            'jurumiyah') {
+
+          progress =
+              (jumlahSetoran / 25) *
+                  100;
+        }
+
+        if (progress > 100) {
+          progress = 100;
+        }
+
+        totalProgress[kitab] =
+            progress;
+      },
+    );
+
+    // ================= MASUK LIST =================
+    totalProgress.forEach(
+      (kitab, progress) {
+
+        progressKitab.add({
+
+          'kitab': kitab,
+
+          'progress': progress,
+        });
+      },
+    );
+
+    // ================= REFRESH UI =================
+    if (mounted) {
+      setState(() {});
+    }
 
   } catch (e) {
 
@@ -404,25 +439,25 @@ Future<void> loadProgressKitab(
 
       appBar: AppBar(
 
-  backgroundColor:
-      Colors.lime[400],
+        backgroundColor:
+            Colors.lime[400],
 
-  title: const Text(
-    'Dashboard Wali Santri',
-  ),
+        title: const Text(
+          'Dashboard Wali Santri',
+        ),
 
-  actions: [
+        actions: [
 
-    IconButton(
+          IconButton(
 
-      onPressed: logout,
+            onPressed: logout,
 
-      icon: const Icon(
-        Icons.logout,
+            icon: const Icon(
+              Icons.logout,
+            ),
+          ),
+        ],
       ),
-    ),
-  ],
-),
 
       body: loading
 
@@ -669,8 +704,7 @@ Future<void> loadProgressKitab(
                                       LinearProgressIndicator(
 
                                     value:
-                                        progress /
-                                            100,
+                                        progress / 100,
 
                                     minHeight:
                                         10,
