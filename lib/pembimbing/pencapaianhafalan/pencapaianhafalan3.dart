@@ -20,6 +20,7 @@ class PencapaianHafalan3Page extends StatefulWidget {
 class _PencapaianHafalan3PageState
     extends State<PencapaianHafalan3Page>
     with SingleTickerProviderStateMixin {
+
   final supabase = Supabase.instance.client;
 
   late TabController _tabController;
@@ -28,53 +29,70 @@ class _PencapaianHafalan3PageState
 
   bool isLoading = true;
 
-  // =========================
-  // NADZAM IMRITHI
-  // =========================
+  // ======================================================
+  // IMRITHI
+  // ======================================================
 
-  final List<String> bagianImrithi = [
-    "Muqoddimah (Pendahuluan)",
-    "Bab Al-Kalam (Kalimat/Ucapan)",
-    "Bab Al-I'rab (Perubahan Akhir Kata)",
-    "Bab Alamat Al-I'rab (Tanda-tanda I'rab)",
-    "Bab Al-Fasl (Fasal tentang Mu'rab)",
-    "Bab Al-Af'al (Kata Kerja/Fi'il)",
-    "Bab Isim-Isim yang Marfu' (Dibaca Rafa')",
-    "Bab Al-Fa'il (Pelaku/Subjek)",
-    "Bab Na'ibul Fa'il (Pengganti Fa'il/Pasif)",
-    "Bab Al-Mubtada' wa Al-Khabar (Subjek & Predikat Isim)",
-    "Bab Kana wa Akhwatuha (Amil Pengubah Mubtada-Khabar)",
-    "Bab Inna wa Akhwatuha",
-    "Bab Zhanna wa Akhwatuha",
-    "Bab At-Tabi' lil Marfu' (Na'at, Athaf, Taukid, Badal)",
-    "Bab Isim-Isim yang Manshub (Dibaca Nashab)",
-    "Bab Al-Mahfuzhat (Isim-Isim yang Dibaca Jer/Khofad)",
-    "Khotimah (Penutup Kitab)",
-  ];
+  final Map<String, String> bagianImrithi = {
 
-  // =========================
-  // NADZAM MAQSUD
-  // =========================
+    "IM 1": "Muqoddimah",
+    "IM 2": "Bab Al-Kalam",
+    "IM 3": "Bab Al-I'rab",
+    "IM 4": "Bab Ma'rifat Alamatil I'rabi",
+    "IM 5": "Bab Al-Af'al",
+    "IM 6": "Bab Al-Mu'rabat",
+    "IM 7": "Bab Al-Nakirah Wal Ma'rifah",
+    "IM 8": "Bab Al-Marfu'at minal Asma'",
+    "IM 9": "Bab Al-Fa'il",
+    "IM 10": "Bab Al-Naib 'an Al-Fa'il",
+    "IM 11": "Bab Al-Mubtada' wal Khabar",
+    "IM 12": "Bab Kana wa Akhwatuha",
+    "IM 13": "Bab Inna wa Akhwatuha",
+    "IM 14": "Bab Dzonna wa Akhwatuha",
+    "IM 15": "Bab Al-Tawabi' (An-Na'ti)",
+    "IM 16": "Bab Al-'Athfi",
+    "IM 17": "Bab Al-Taukid",
+    "IM 18": "Bab Al-Badal",
+    "IM 19": "Bab Al-Manshubat minal Asma'",
+    "IM 20": "Bab Al-Maf'ul bihi",
+    "IM 21": "Bab Al-Mashdar",
+    "IM 22": "Bab Dzhorf Zaman wa Dzhorf Makan",
+    "IM 23": "Bab Al-Hal",
+    "IM 24": "Bab Al-Tamyiz",
+    "IM 25": "Bab Al-Istitsna'",
+    "IM 26": "Bab Al-Laa",
+    "IM 27": "Bab Al-Munada",
+    "IM 28": "Bab Al-Maf'ul li Ajlih",
+    "IM 29": "Bab Al-Maf'ul Ma'ah",
+    "IM 30": "Bab Al-Makhfudhat minal Asma'",
+    "IM 31": "Khotimah",
+  };
 
-  final List<String> bagianMaqsud = [
-    "Muqoddimah (Pendahuluan)",
-    "Bab Tsulatsi Mujarrad (Kata Kerja 3 Huruf Asli)",
-    "Bab Tsulatsi Mazid (3 Huruf dengan Tambahan)",
-    "Bab Ruba'i (Kata Kerja 4 Huruf Asli & Tambahannya)",
-    "Bab Mulhaq Ruba'i",
-    "Bab Shahih wa Ghair Shahih",
-    "Bab Mudha'af",
-    "Bab Mahmuz",
-    "Bab Mu'tal",
-    "Bab Lafif wa Mutadakhil",
-    "Bab Idgham",
-    "Bab Isim-Isim",
-    "Khotimah (Penutup Kitab)",
-  ];
+  // ======================================================
+  // MAQSUD
+  // ======================================================
 
-  // =========================
-  // CHECKLIST DATA
-  // =========================
+  final Map<String, String> bagianMaqsud = {
+
+    "MQ 1": "Muqoddimah",
+    "MQ 2": "Bab Al-Tsulatsi Al-Mujarrad",
+    "MQ 3": "Bab Al-Tsulatsi Al-Mazid",
+    "MQ 4": "Bab Al-Ruba'i Wal Khumasi",
+    "MQ 5": "Bab Shahih Wal Mudho'af",
+    "MQ 6": "Bab Al-Mu'tal",
+    "MQ 7": "Bab Al-Lafif Wal Mahmuz",
+    "MQ 8": "Bab Tasrif Al-Af'al",
+    "MQ 9": "Bab Al-Amr Wal Nahyi",
+    "MQ 10": "Bab Isim Fai'l Wal Isim Maf'ul",
+    "MQ 11": "Bab Isim Zaman Wal Makan",
+    "MQ 12": "Bab Isim Alah",
+    "MQ 13": "Bab Al-I'lal",
+    "MQ 14": "Khotimah",
+  };
+
+  // ======================================================
+  // CHECKLIST
+  // ======================================================
 
   Map<String, Map<String, bool>> checklistImrithi = {};
 
@@ -98,32 +116,36 @@ class _PencapaianHafalan3PageState
     super.dispose();
   }
 
-  // =========================
+  // ======================================================
   // GET SANTRI
-  // =========================
+  // ======================================================
 
   Future<void> getSantri() async {
+
     try {
+
       final response = await supabase
           .from('santri')
           .select()
           .eq('marhalah', widget.marhalah)
           .order('nama_lengkap');
 
-      santriList = List<Map<String, dynamic>>.from(response);
+      santriList =
+          List<Map<String, dynamic>>.from(response);
 
       for (var santri in santriList) {
+
         String nama = santri['nama_lengkap'];
 
         checklistImrithi[nama] = {};
         checklistMaqsud[nama] = {};
 
-        for (var bagian in bagianImrithi) {
-          checklistImrithi[nama]![bagian] = false;
+        for (var kode in bagianImrithi.keys) {
+          checklistImrithi[nama]![kode] = false;
         }
 
-        for (var bagian in bagianMaqsud) {
-          checklistMaqsud[nama]![bagian] = false;
+        for (var kode in bagianMaqsud.keys) {
+          checklistMaqsud[nama]![kode] = false;
         }
       }
 
@@ -132,7 +154,9 @@ class _PencapaianHafalan3PageState
       setState(() {
         isLoading = false;
       });
+
     } catch (e) {
+
       debugPrint('Error get santri: $e');
 
       setState(() {
@@ -141,56 +165,78 @@ class _PencapaianHafalan3PageState
     }
   }
 
-  // =========================
+  // ======================================================
   // LOAD CHECKLIST
-  // =========================
+  // ======================================================
 
   Future<void> loadChecklist() async {
+
     try {
+
       final response = await supabase
           .from('pencapaian_hafalan')
           .select()
           .eq('marhalah', widget.marhalah);
 
       for (var item in response) {
+
         String nama = item['nama_santri'];
         String kitab = item['kitab'];
         String bagian = item['bagian'];
         bool status = item['status'];
 
-        // IMRITHI
         if (kitab == 'Nadzam Imrithi') {
+
           if (checklistImrithi.containsKey(nama)) {
-            checklistImrithi[nama]![bagian] = status;
+
+            checklistImrithi[nama]![bagian] =
+                status;
           }
         }
 
-        // MAQSUD
         if (kitab == 'Nadzam Maqsud') {
+
           if (checklistMaqsud.containsKey(nama)) {
-            checklistMaqsud[nama]![bagian] = status;
+
+            checklistMaqsud[nama]![bagian] =
+                status;
           }
         }
       }
+
     } catch (e) {
+
       debugPrint('Error load checklist: $e');
     }
   }
 
-  // =========================
-  // SIMPAN IMRITHI
-  // =========================
+  // ======================================================
+  // SIMPAN
+  // ======================================================
 
-  Future<void> simpanImrithi() async {
+  Future<void> simpanData({
+
+    required String kitab,
+    required Map<String, Map<String, bool>>
+        checklistData,
+
+  }) async {
+
     try {
-      for (var santri in checklistImrithi.entries) {
+
+      for (var santri in checklistData.entries) {
+
         String namaSantri = santri.key;
 
         for (var bagian in santri.value.entries) {
-          await supabase.from('pencapaian_hafalan').upsert({
+
+          await supabase
+              .from('pencapaian_hafalan')
+              .upsert({
+
             'nama_santri': namaSantri,
             'marhalah': widget.marhalah,
-            'kitab': 'Nadzam Imrithi',
+            'kitab': kitab,
             'bagian': bagian.key,
             'status': bagian.value,
           });
@@ -198,171 +244,275 @@ class _PencapaianHafalan3PageState
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Data Imrithi berhasil disimpan'),
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+
+          SnackBar(
+            content: Text(
+              'Data $kitab berhasil disimpan',
+            ),
             backgroundColor: Colors.green,
           ),
         );
       }
+
     } catch (e) {
-      debugPrint('Error simpan Imrithi: $e');
+
+      debugPrint('Error simpan: $e');
     }
   }
 
-  // =========================
-  // SIMPAN MAQSUD
-  // =========================
+  // ======================================================
+  // CETAK PDF
+  // ======================================================
 
-  Future<void> simpanMaqsud() async {
-    try {
-      for (var santri in checklistMaqsud.entries) {
-        String namaSantri = santri.key;
+  Future<void> cetakPDF({
 
-        for (var bagian in santri.value.entries) {
-          await supabase.from('pencapaian_hafalan').upsert({
-            'nama_santri': namaSantri,
-            'marhalah': widget.marhalah,
-            'kitab': 'Nadzam Maqsud',
-            'bagian': bagian.key,
-            'status': bagian.value,
-          });
-        }
-      }
+    required String judul,
+    required String kitab,
+    required Map<String, String> bagianMap,
+    required Map<String, Map<String, bool>>
+        checklistData,
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Data Maqsud berhasil disimpan'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      debugPrint('Error simpan Maqsud: $e');
-    }
-  }
+  }) async {
 
-  // =========================
-  // PDF
-  // =========================
-
-  Future<void> cetakPDF(
-    String judul,
-    List<String> bagianList,
-    Map<String, Map<String, bool>> checklistData,
-  ) async {
     final pdf = pw.Document();
 
     pdf.addPage(
-      pw.Page(
-        pageFormat: PdfPageFormat.a3.landscape,
-        build: (pw.Context context) {
-          return pw.Column(
-            children: [
-              pw.Text(
-                judul,
-                style: pw.TextStyle(
-                  fontSize: 20,
-                  fontWeight: pw.FontWeight.bold,
-                ),
+
+      pw.MultiPage(
+
+        pageFormat:
+            PdfPageFormat.a3.landscape,
+
+        build: (context) {
+
+          return [
+
+            pw.Text(
+
+              judul,
+
+              style: pw.TextStyle(
+                fontSize: 20,
+                fontWeight:
+                    pw.FontWeight.bold,
+              ),
+            ),
+
+            pw.SizedBox(height: 20),
+
+            // ==========================================
+            // TABEL
+            // ==========================================
+
+            pw.Table.fromTextArray(
+
+              cellAlignment:
+                  pw.Alignment.center,
+
+              headerStyle: pw.TextStyle(
+                fontWeight:
+                    pw.FontWeight.bold,
+                fontSize: 9,
               ),
 
-              pw.SizedBox(height: 20),
-
-              pw.Table.fromTextArray(
-                headers: [
-                  'Nama Santri',
-                  ...bagianList,
-                ],
-                data: santriList.map((santri) {
-                  String nama = santri['nama_lengkap'];
-
-                  return [
-                    nama,
-                    ...bagianList.map((bagian) {
-                      return checklistData[nama]![bagian] == true
-                          ? '✓'
-                          : '';
-                    }).toList(),
-                  ];
-                }).toList(),
+              cellStyle: const pw.TextStyle(
+                fontSize: 8,
               ),
-            ],
-          );
+
+              headers: [
+
+                'Nama',
+
+                ...bagianMap.keys,
+              ],
+
+              data: santriList.map((santri) {
+
+                String nama =
+                    santri['nama_lengkap'];
+
+                return [
+
+                  nama,
+
+                  ...bagianMap.keys.map((kode) {
+
+                    return checklistData[nama]![kode] ==
+                            true
+                        ? '✓'
+                        : '';
+
+                  }).toList(),
+                ];
+
+              }).toList(),
+            ),
+
+            pw.SizedBox(height: 20),
+
+            // ==========================================
+            // KETERANGAN
+            // ==========================================
+
+            pw.Text(
+
+              'Keterangan Singkatan',
+
+              style: pw.TextStyle(
+                fontWeight:
+                    pw.FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+
+            pw.SizedBox(height: 10),
+
+            ...bagianMap.entries.map(
+
+              (e) {
+
+                return pw.Padding(
+
+                  padding:
+                      const pw.EdgeInsets.only(
+                    bottom: 3,
+                  ),
+
+                  child: pw.Text(
+
+                    '${e.key} : ${e.value}',
+
+                    style: const pw.TextStyle(
+                      fontSize: 10,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ];
         },
       ),
     );
 
     await Printing.layoutPdf(
-      onLayout: (format) async => pdf.save(),
+
+      onLayout: (format) async =>
+          pdf.save(),
     );
   }
 
-  // =========================
+  // ======================================================
   // BUILD TABLE
-  // =========================
+  // ======================================================
 
   Widget buildTable({
-    required List<String> bagianList,
-    required Map<String, Map<String, bool>> checklistData,
+
+    required Map<String, String> bagianMap,
+
+    required Map<String, Map<String, bool>>
+        checklistData,
+
   }) {
+
     return SingleChildScrollView(
+
       scrollDirection: Axis.horizontal,
+
       child: DataTable(
+
         border: TableBorder.all(
           color: Colors.black12,
         ),
-        headingRowColor: MaterialStateProperty.all(
+
+        headingRowColor:
+            MaterialStateProperty.all(
           Colors.green.shade100,
         ),
+
         columns: [
+
           const DataColumn(
+
             label: SizedBox(
+
               width: 150,
+
               child: Text(
+
                 'Nama Santri',
+
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight:
+                      FontWeight.bold,
                 ),
               ),
             ),
           ),
 
-          ...bagianList.map(
-            (bagian) => DataColumn(
+          ...bagianMap.keys.map(
+
+            (kode) => DataColumn(
+
               label: SizedBox(
-                width: 150,
+
+                width: 70,
+
                 child: Text(
-                  bagian,
+
+                  kode,
+
+                  textAlign:
+                      TextAlign.center,
+
                   style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+
+                    fontWeight:
+                        FontWeight.bold,
+
+                    fontSize: 11,
                   ),
                 ),
               ),
             ),
           ),
         ],
+
         rows: santriList.map((santri) {
-          String nama = santri['nama_lengkap'];
+
+          String nama =
+              santri['nama_lengkap'];
 
           return DataRow(
+
             cells: [
+
               DataCell(
+
                 SizedBox(
+
                   width: 150,
+
                   child: Text(nama),
                 ),
               ),
 
-              ...bagianList.map(
-                (bagian) => DataCell(
+              ...bagianMap.keys.map(
+
+                (kode) => DataCell(
+
                   Checkbox(
-                    value: checklistData[nama]![bagian],
+
+                    value:
+                        checklistData[nama]![kode],
+
                     onChanged: (value) {
+
                       setState(() {
-                        checklistData[nama]![bagian] =
+
+                        checklistData[nama]![kode] =
                             value ?? false;
                       });
                     },
@@ -371,30 +521,105 @@ class _PencapaianHafalan3PageState
               ),
             ],
           );
+
         }).toList(),
       ),
     );
   }
 
-  // =========================
+  // ======================================================
+  // BUILD KETERANGAN
+  // ======================================================
+
+  Widget buildKeterangan(
+    Map<String, String> bagianMap,
+  ) {
+
+    return Container(
+
+      margin: const EdgeInsets.all(12),
+
+      padding: const EdgeInsets.all(16),
+
+      decoration: BoxDecoration(
+
+        color: Colors.white,
+
+        borderRadius:
+            BorderRadius.circular(16),
+      ),
+
+      child: Column(
+
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
+
+        children: [
+
+          const Text(
+
+            'Keterangan Singkatan',
+
+            style: TextStyle(
+
+              fontWeight: FontWeight.bold,
+
+              fontSize: 16,
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          ...bagianMap.entries.map(
+
+            (e) {
+
+              return Padding(
+
+                padding:
+                    const EdgeInsets.only(
+                  bottom: 6,
+                ),
+
+                child: Text(
+
+                  '${e.key} : ${e.value}',
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ======================================================
   // BUILD
-  // =========================
+  // ======================================================
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
+
       appBar: AppBar(
+
         title: const Text(
           'Pencapaian Hafalan Marhalah 3',
         ),
+
         backgroundColor: Colors.green,
 
         bottom: TabBar(
+
           controller: _tabController,
+
           tabs: const [
+
             Tab(
               text: 'Nadzam Imrithi',
             ),
+
             Tab(
               text: 'Nadzam Maqsud',
             ),
@@ -403,35 +628,70 @@ class _PencapaianHafalan3PageState
       ),
 
       body: isLoading
+
           ? const Center(
-              child: CircularProgressIndicator(),
+              child:
+                  CircularProgressIndicator(),
             )
+
           : TabBarView(
+
               controller: _tabController,
+
               children: [
 
-                // =====================
+                // ======================================
                 // TAB IMRITHI
-                // =====================
+                // ======================================
 
                 Column(
+
                   children: [
+
                     const SizedBox(height: 10),
 
                     Padding(
-                      padding: const EdgeInsets.symmetric(
+
+                      padding:
+                          const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
+
                       child: Row(
+
                         children: [
+
                           Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: simpanImrithi,
-                              icon: const Icon(Icons.save),
-                              label: const Text('Simpan'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
+
+                            child:
+                                ElevatedButton.icon(
+
+                              onPressed: () {
+
+                                simpanData(
+
+                                  kitab:
+                                      'Nadzam Imrithi',
+
+                                  checklistData:
+                                      checklistImrithi,
+                                );
+                              },
+
+                              icon:
+                                  const Icon(Icons.save),
+
+                              label:
+                                  const Text('Simpan'),
+
+                              style:
+                                  ElevatedButton.styleFrom(
+
+                                backgroundColor:
+                                    Colors.green,
+
+                                foregroundColor:
+                                    Colors.white,
                               ),
                             ),
                           ),
@@ -439,19 +699,43 @@ class _PencapaianHafalan3PageState
                           const SizedBox(width: 10),
 
                           Expanded(
-                            child: ElevatedButton.icon(
+
+                            child:
+                                ElevatedButton.icon(
+
                               onPressed: () {
+
                                 cetakPDF(
-                                  'Pencapaian Hafalan Nadzam Imrithi',
-                                  bagianImrithi,
-                                  checklistImrithi,
+
+                                  judul:
+                                      'Pencapaian Hafalan Nadzam Imrithi',
+
+                                  kitab:
+                                      'Nadzam Imrithi',
+
+                                  bagianMap:
+                                      bagianImrithi,
+
+                                  checklistData:
+                                      checklistImrithi,
                                 );
                               },
-                              icon: const Icon(Icons.picture_as_pdf),
-                              label: const Text('Cetak PDF'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
+
+                              icon: const Icon(
+                                Icons.picture_as_pdf,
+                              ),
+
+                              label:
+                                  const Text('Cetak PDF'),
+
+                              style:
+                                  ElevatedButton.styleFrom(
+
+                                backgroundColor:
+                                    Colors.red,
+
+                                foregroundColor:
+                                    Colors.white,
                               ),
                             ),
                           ),
@@ -462,39 +746,81 @@ class _PencapaianHafalan3PageState
                     const SizedBox(height: 10),
 
                     Expanded(
+
                       child: Padding(
-                        padding: const EdgeInsets.all(12),
+
+                        padding:
+                            const EdgeInsets.all(12),
+
                         child: buildTable(
-                          bagianList: bagianImrithi,
-                          checklistData: checklistImrithi,
+
+                          bagianMap:
+                              bagianImrithi,
+
+                          checklistData:
+                              checklistImrithi,
                         ),
                       ),
+                    ),
+
+                    buildKeterangan(
+                      bagianImrithi,
                     ),
                   ],
                 ),
 
-                // =====================
+                // ======================================
                 // TAB MAQSUD
-                // =====================
+                // ======================================
 
                 Column(
+
                   children: [
+
                     const SizedBox(height: 10),
 
                     Padding(
-                      padding: const EdgeInsets.symmetric(
+
+                      padding:
+                          const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
+
                       child: Row(
+
                         children: [
+
                           Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: simpanMaqsud,
-                              icon: const Icon(Icons.save),
-                              label: const Text('Simpan'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                foregroundColor: Colors.white,
+
+                            child:
+                                ElevatedButton.icon(
+
+                              onPressed: () {
+
+                                simpanData(
+
+                                  kitab:
+                                      'Nadzam Maqsud',
+
+                                  checklistData:
+                                      checklistMaqsud,
+                                );
+                              },
+
+                              icon:
+                                  const Icon(Icons.save),
+
+                              label:
+                                  const Text('Simpan'),
+
+                              style:
+                                  ElevatedButton.styleFrom(
+
+                                backgroundColor:
+                                    Colors.green,
+
+                                foregroundColor:
+                                    Colors.white,
                               ),
                             ),
                           ),
@@ -502,19 +828,43 @@ class _PencapaianHafalan3PageState
                           const SizedBox(width: 10),
 
                           Expanded(
-                            child: ElevatedButton.icon(
+
+                            child:
+                                ElevatedButton.icon(
+
                               onPressed: () {
+
                                 cetakPDF(
-                                  'Pencapaian Hafalan Nadzam Maqsud',
-                                  bagianMaqsud,
-                                  checklistMaqsud,
+
+                                  judul:
+                                      'Pencapaian Hafalan Nadzam Maqsud',
+
+                                  kitab:
+                                      'Nadzam Maqsud',
+
+                                  bagianMap:
+                                      bagianMaqsud,
+
+                                  checklistData:
+                                      checklistMaqsud,
                                 );
                               },
-                              icon: const Icon(Icons.picture_as_pdf),
-                              label: const Text('Cetak PDF'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
+
+                              icon: const Icon(
+                                Icons.picture_as_pdf,
+                              ),
+
+                              label:
+                                  const Text('Cetak PDF'),
+
+                              style:
+                                  ElevatedButton.styleFrom(
+
+                                backgroundColor:
+                                    Colors.red,
+
+                                foregroundColor:
+                                    Colors.white,
                               ),
                             ),
                           ),
@@ -525,13 +875,25 @@ class _PencapaianHafalan3PageState
                     const SizedBox(height: 10),
 
                     Expanded(
+
                       child: Padding(
-                        padding: const EdgeInsets.all(12),
+
+                        padding:
+                            const EdgeInsets.all(12),
+
                         child: buildTable(
-                          bagianList: bagianMaqsud,
-                          checklistData: checklistMaqsud,
+
+                          bagianMap:
+                              bagianMaqsud,
+
+                          checklistData:
+                              checklistMaqsud,
                         ),
                       ),
+                    ),
+
+                    buildKeterangan(
+                      bagianMaqsud,
                     ),
                   ],
                 ),

@@ -26,80 +26,80 @@ class _PencapaianHafalan4PageState
   bool isLoading = true;
 
   // =========================
-  // NADZAM ALFIYAH
+  // SINGKATAN ALFIYAH
   // =========================
 
-  final List<String> bagianAlfiyah = [
-    "Muqoddimah (Pendahuluan)",
-    "Al-Kalam wa Ma Yatafallafu Minhu",
-    "Al-Mu'rab wa Al-Mabni",
-    "Al-Ma'rifah wa Al-Nakirah",
-    "Al-Dhamir",
-    "Al-Alam",
-    "Ismul Isyarah",
-    "Al-Mawshul",
-    "Al-Mu'arraf bi Al-Adat",
-    "Al-Mubtada' wa Al-Khabar",
-    "Kana wa Akhwatuha",
-    "Al-Af'al Al-Muqarabah",
-    "Inna wa Akhwatuha",
-    "La Allati Linahyi Al-Jins",
-    "Zhanna wa Akhwatuha",
-    "A'lama wa Ara",
-    "Al-Fa'il",
-    "Al-Na'ib 'an Al-Fa'il",
-    "Isytighal Al-Amil 'an Al-Ma'mul",
-    "Al-Ta'addi wa Al-Luzum",
-    "Al-Tanazu' fi Al-Amal",
-    "Al-Mafa'il",
-    "Al-Maf'ul Al-Muthlaq",
-    "Al-Maf'ul Lahu",
-    "Al-Maf'ul Fihi",
-    "Al-Maf'ul Ma'ahu",
-    "Al-Istitsna'",
-    "Al-Hal",
-    "Al-Tamyiz",
-    "Al-Huruf Al-Jarr",
-    "Al-Idhafah",
-    "Al-Mudhaf ila Ya' Al-Mutakallim",
-    "Imal Al-Mashdar",
-    "Imal Ism Al-Fa'il",
-    "Al-Abniyah Li-Asma' Al-Fa'ilin",
-    "Al-Sifatus Musyabbahah",
-    "Al-Ta'ajjub",
-    "Ni'ma wa Bi'sa",
-    "Af'alu Al-Tafdhil",
-    "Al-Tawabi'",
-    "Al-Na'at",
-    "Al-Taukid",
-    "Al-Athaf",
-    "Al-Badal",
-    "Al-Nida'",
-    "Al-Ikhtishash",
-    "Al-Tahdzir wa Al-Ighra'",
-    "Asma' Al-Af'al wa Asma' Al-Aswat",
-    "Al-Nun Al-Taukid",
-    "Al-Mamnu' min Al-Sharf",
-    "I'rab Al-Fi'il",
-    "Al-Awwamil Al-Jazimah",
-    "Al-Lawiyah",
-    "Al-Amal bi Al-Adad",
-    "Al-Kam wa Al-Ka'ayyin wa Al-Kadza",
-    "Al-Hikayah",
-    "Al-Tanwin Al-Mu'awwadh",
-    "Al-Imalah",
-    "Al-Tasghir",
-    "Al-Nasab",
-    "Al-Waqf",
-    "Al-I'lal wa Al-Ibdal",
-    "Fashl Ibdal Al-Waw wa Al-Ya' Alif",
-    "Fashl Nuqila Al-Harakah",
-    "Fashl Ibdal Al-Waw wa Al-Ya' Taa'",
-    "Fashl Al-Ibdal min Huruf Shahihah",
-    "Fashl fi Hadf Al-Waw",
-    "Al-Idgham",
-    "Khotimah (Penutup Kitab)",
-  ];
+  final Map<String, String> bagianAlfiyah = {
+    "AF 1": "Muqoddimah (Pendahuluan)",
+    "AF 2": "Al-Kalam wa Ma Yatafallafu Minhu",
+    "AF 3": "Al-Mu'rab wa Al-Mabni",
+    "AF 4": "Al-Ma'rifah wa Al-Nakirah",
+    "AF 5": "Al-Dhamir",
+    "AF 6": "Al-Alam",
+    "AF 7": "Ismul Isyarah",
+    "AF 8": "Al-Mawshul",
+    "AF 9": "Al-Mu'arraf bi Al-Adat",
+    "AF 10": "Al-Mubtada' wa Al-Khabar",
+    "AF 11": "Kana wa Akhwatuha",
+    "AF 12": "Al-Af'al Al-Muqarabah",
+    "AF 13": "Inna wa Akhwatuha",
+    "AF 14": "La Allati Linahyi Al-Jins",
+    "AF 15": "Zhanna wa Akhwatuha",
+    "AF 16": "A'lama wa Ara",
+    "AF 17": "Al-Fa'il",
+    "AF 18": "Al-Na'ib 'an Al-Fa'il",
+    "AF 19": "Isytighal Al-Amil 'an Al-Ma'mul",
+    "AF 20": "Al-Ta'addi wa Al-Luzum",
+    "AF 21": "Al-Tanazu' fi Al-Amal",
+    "AF 22": "Al-Mafa'il",
+    "AF 23": "Al-Maf'ul Al-Muthlaq",
+    "AF 24": "Al-Maf'ul Lahu",
+    "AF 25": "Al-Maf'ul Fihi",
+    "AF 26": "Al-Maf'ul Ma'ahu",
+    "AF 27": "Al-Institsna'",
+    "AF 28": "Al-Hal",
+    "AF 29": "Al-Tamyiz",
+    "AF 30": "Al-Huruf Al-Jarr",
+    "AF 31": "Al-Idhafah",
+    "AF 32": "Al-Mudhaf ila Ya' Al-Mutakallim",
+    "AF 33": "Imal Al-Mashdar",
+    "AF 34": "Imal Ism Al-Fa'il",
+    "AF 35": "Al-Abniyah Li-Asma' Al-Fa'ilin",
+    "AF 36": "Al-Sifatus Musyabbahah",
+    "AF 37": "Al-Ta'ajjub",
+    "AF 38": "Ni'ma wa Bi'sa",
+    "AF 39": "Af'alu Al-Tafdhil",
+    "AF 40": "Al-Tawabi'",
+    "AF 41": "Al-Na'at",
+    "AF 42": "Al-Taukid",
+    "AF 43": "Al-Athaf",
+    "AF 44": "Al-Badal",
+    "AF 45": "Al-Nida'",
+    "AF 46": "Al-Ikhtishash",
+    "AF 47": "Al-Tahdzir wa Al-Ighra'",
+    "AF 48": "Asma' Al-Af'al wa Asma' Al-Aswat",
+    "AF 49": "Al-Nun Al-Taukid",
+    "AF 50": "Al-Mamnu' min Al-Sharf",
+    "AF 51": "I'rab Al-Fi'il",
+    "AF 52": "Al-Awwamil Al-Jazimah",
+    "AF 53": "Al-Lawiyah",
+    "AF 54": "Al-Amal bi Al-Adad",
+    "AF 55": "Al-Kam wa Al-Ka'ayyin wa Al-Kadza",
+    "AF 56": "Al-Hikayah",
+    "AF 57": "Al-Tanwin Al-Mu'awwadh",
+    "AF 58": "Al-Imalah",
+    "AF 59": "Al-Tasghir",
+    "AF 60": "Al-Nasab",
+    "AF 61": "Al-Waqf",
+    "AF 62": "Al-I'lal wa Al-Ibdal",
+    "AF 63": "Fashl Ibdal Al-Waw wa Al-Ya' Alif",
+    "AF 64": "Fashl Nuqila Al-Harakah",
+    "AF 65": "Fashl Ibdal Al-Waw wa Al-Ya' Taa'",
+    "AF 66": "Fashl Al-Ibdal min Huruf Shahihah",
+    "AF 67": "Fashl fi Hadf Al-Waw",
+    "AF 68": "Al-Idgham",
+    "AF 69": "Khotimah (Penutup Kitab)",
+  };
 
   // =========================
   // CHECKLIST DATA
@@ -132,8 +132,8 @@ class _PencapaianHafalan4PageState
 
         checklistData[nama] = {};
 
-        for (var bagian in bagianAlfiyah) {
-          checklistData[nama]![bagian] = false;
+        for (var kode in bagianAlfiyah.keys) {
+          checklistData[nama]![kode] = false;
         }
       }
 
@@ -228,7 +228,7 @@ class _PencapaianHafalan4PageState
 
     pdf.addPage(
       pw.MultiPage(
-        pageFormat: PdfPageFormat.a4.landscape,
+        pageFormat: PdfPageFormat.a3.landscape,
 
         build: (pw.Context context) {
           return [
@@ -243,9 +243,18 @@ class _PencapaianHafalan4PageState
             pw.SizedBox(height: 20),
 
             pw.Table.fromTextArray(
+              cellStyle: const pw.TextStyle(
+                fontSize: 8,
+              ),
+
+              headerStyle: pw.TextStyle(
+                fontSize: 8,
+                fontWeight: pw.FontWeight.bold,
+              ),
+
               headers: [
-                'Nama Santri',
-                ...bagianAlfiyah,
+                'Nama',
+                ...bagianAlfiyah.keys,
               ],
 
               data: santriList.map((santri) {
@@ -254,13 +263,37 @@ class _PencapaianHafalan4PageState
                 return [
                   nama,
 
-                  ...bagianAlfiyah.map((bagian) {
-                    return checklistData[nama]![bagian] == true
+                  ...bagianAlfiyah.keys.map((kode) {
+                    return checklistData[nama]![kode] == true
                         ? '✓'
                         : '';
                   }).toList(),
                 ];
               }).toList(),
+            ),
+
+            pw.SizedBox(height: 25),
+
+            pw.Text(
+              'Keterangan Singkatan:',
+              style: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold,
+                fontSize: 12,
+              ),
+            ),
+
+            pw.SizedBox(height: 10),
+
+            ...bagianAlfiyah.entries.map(
+              (e) => pw.Padding(
+                padding: const pw.EdgeInsets.only(bottom: 4),
+                child: pw.Text(
+                  '${e.key} : ${e.value}',
+                  style: const pw.TextStyle(
+                    fontSize: 9,
+                  ),
+                ),
+              ),
             ),
           ];
         },
@@ -302,12 +335,12 @@ class _PencapaianHafalan4PageState
             ),
           ),
 
-          ...bagianAlfiyah.map(
-            (bagian) => DataColumn(
+          ...bagianAlfiyah.keys.map(
+            (kode) => DataColumn(
               label: SizedBox(
-                width: 170,
+                width: 70,
                 child: Text(
-                  bagian,
+                  kode,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 11,
@@ -330,14 +363,14 @@ class _PencapaianHafalan4PageState
                 ),
               ),
 
-              ...bagianAlfiyah.map(
-                (bagian) => DataCell(
+              ...bagianAlfiyah.keys.map(
+                (kode) => DataCell(
                   Checkbox(
-                    value: checklistData[nama]![bagian],
+                    value: checklistData[nama]![kode],
 
                     onChanged: (value) {
                       setState(() {
-                        checklistData[nama]![bagian] =
+                        checklistData[nama]![kode] =
                             value ?? false;
                       });
                     },
@@ -347,6 +380,49 @@ class _PencapaianHafalan4PageState
             ],
           );
         }).toList(),
+      ),
+    );
+  }
+
+  // =========================
+  // BUILD KETERANGAN
+  // =========================
+
+  Widget buildKeterangan() {
+    return Container(
+      margin: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
+
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Keterangan Singkatan',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          ...bagianAlfiyah.entries.map(
+            (e) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                '${e.key} : ${e.value}',
+                style: const TextStyle(
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -425,10 +501,17 @@ class _PencapaianHafalan4PageState
                 const SizedBox(height: 10),
 
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
+                  child: ListView(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: buildTable(),
+                      ),
 
-                    child: buildTable(),
+                      buildKeterangan(),
+
+                      const SizedBox(height: 20),
+                    ],
                   ),
                 ),
               ],
