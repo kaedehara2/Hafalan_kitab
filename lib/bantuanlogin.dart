@@ -20,45 +20,43 @@ class _BantuanLoginPageState
   String selectedRole = '';
 
   // ================= WHATSAPP =================
-  Future<void> bukaWhatsApp({
-    required String pesan,
-  }) async {
+Future<void> bukaWhatsApp({
+  required String pesan,
+}) async {
+  final nomorDeveloper = '62895398355567';
 
-    // ================= NOMOR DEVELOPER =================
-    final nomorDeveloper =
-        '62895398355567';
+  final Uri whatsappApp = Uri.parse(
+    'whatsapp://send?phone=$nomorDeveloper&text=${Uri.encodeComponent(pesan)}',
+  );
 
-    final url = Uri.parse(
+  final Uri whatsappWeb = Uri.parse(
+    'https://wa.me/$nomorDeveloper?text=${Uri.encodeComponent(pesan)}',
+  );
 
-      'https://wa.me/$nomorDeveloper?text=${Uri.encodeComponent(pesan)}',
-    );
-
-    if (await canLaunchUrl(url)) {
-
+  try {
+    if (await canLaunchUrl(whatsappApp)) {
       await launchUrl(
-
-        url,
-
-        mode:
-            LaunchMode.externalApplication,
+        whatsappApp,
+        mode: LaunchMode.externalApplication,
       );
-
     } else {
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        const SnackBar(
-
-          content: Text(
-            'WhatsApp tidak dapat dibuka',
-          ),
-        ),
+      await launchUrl(
+        whatsappWeb,
+        mode: LaunchMode.externalApplication,
       );
     }
+  } catch (e) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Gagal membuka WhatsApp',
+        ),
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
