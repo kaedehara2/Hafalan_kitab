@@ -360,7 +360,7 @@ class _ImrithiPageState extends State<ImrithiPage> {
             const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
 
-          childAspectRatio: 2.6,
+          childAspectRatio: 1.5,
 
           crossAxisSpacing: 10,
 
@@ -415,16 +415,14 @@ class _ImrithiPageState extends State<ImrithiPage> {
 
                     children: [
                       Text(
-                        "${santri['nama_lengkap']} | ${santri['kelas']}",
-
-                        style:
-                            const TextStyle(
-                          fontSize: 16,
-
-                          fontWeight:
-                              FontWeight.bold,
-                        ),
-                      ),
+                    "${santri['nama_lengkap']} | ${santri['kelas']}",
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
 
                       const SizedBox(
                           height: 14),

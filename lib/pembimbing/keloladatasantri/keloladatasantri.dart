@@ -296,6 +296,8 @@ class _KelolaDataSantriState
 
       isScrollControlled: true,
 
+      useSafeArea: true,
+
       shape:
           const RoundedRectangleBorder(
 
@@ -341,6 +343,8 @@ class _KelolaDataSantriState
 
       isScrollControlled: true,
 
+      useSafeArea: true,
+
       shape:
           const RoundedRectangleBorder(
 
@@ -359,31 +363,29 @@ class _KelolaDataSantriState
   }
 
   Widget _buildFormModal(
-    String title,
-    Future<void> Function() onSave,
-  ) {
+  String title,
+  Future<void> Function() onSave,
+) {
+  return Padding(
+    padding: EdgeInsets.only(
+      bottom: MediaQuery.of(context).viewInsets.bottom,
+      left: 16,
+      right: 16,
+      top: 16,
+    ),
 
-    return Padding(
+    child: SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
 
-      padding: EdgeInsets.only(
-        bottom:
-            MediaQuery.of(context)
-                .viewInsets
-                .bottom,
-        left: 16,
-        right: 16,
-        top: 16,
-      ),
-
-      child: Wrap(
         children: [
 
           Text(
             title,
             style: const TextStyle(
               fontSize: 18,
-              fontWeight:
-                  FontWeight.bold,
+              fontWeight: FontWeight.bold,
             ),
           ),
 
@@ -397,22 +399,19 @@ class _KelolaDataSantriState
           const SizedBox(height: 12),
 
           TextField(
-
-            controller:
-                kelasController,
+            controller: kelasController,
 
             keyboardType:
                 TextInputType.number,
 
             inputFormatters: [
               FilteringTextInputFormatter
-                  .digitsOnly
+                  .digitsOnly,
             ],
 
             decoration:
                 const InputDecoration(
-              labelText:
-                  'Kelas (angka)',
+              labelText: 'Kelas (angka)',
               border:
                   OutlineInputBorder(),
             ),
@@ -439,32 +438,38 @@ class _KelolaDataSantriState
             'Nama Orang Tua / Wali',
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          ElevatedButton(
+          SizedBox(
+            width: double.infinity,
 
-            onPressed: onSave,
+            child: ElevatedButton(
+              onPressed: onSave,
 
-            style:
-                ElevatedButton.styleFrom(
-              backgroundColor:
-                  Colors.lime[600],
+              style:
+                  ElevatedButton.styleFrom(
+                backgroundColor:
+                    Colors.lime[600],
 
-              minimumSize:
-                  const Size(
-                double.infinity,
-                50,
+                minimumSize:
+                    const Size(
+                  double.infinity,
+                  50,
+                ),
+              ),
+
+              child: const Text(
+                'Simpan',
               ),
             ),
-
-            child:
-                const Text('Simpan'),
           ),
+
+          const SizedBox(height: 20),
         ],
       ),
-    );
-  }
-
+    ),
+  );
+}
   // ================= INPUT =================
   Widget _input(
     TextEditingController c,

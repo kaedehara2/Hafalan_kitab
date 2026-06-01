@@ -531,67 +531,59 @@ class _PencapaianHafalan3PageState
   // BUILD KETERANGAN
   // ======================================================
 
-  Widget buildKeterangan(
-    Map<String, String> bagianMap,
-  ) {
+ Widget buildKeterangan(
+  Map<String, String> bagianMap,
+) {
+  return Container(
+    margin: const EdgeInsets.all(12),
 
-    return Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+    ),
 
-      margin: const EdgeInsets.all(12),
+    child: ExpansionTile(
+      initiallyExpanded: false,
 
-      padding: const EdgeInsets.all(16),
-
-      decoration: BoxDecoration(
-
-        color: Colors.white,
-
-        borderRadius:
-            BorderRadius.circular(16),
+      title: const Text(
+        'Keterangan Singkatan',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
       ),
 
-      child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16),
 
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+          child: Column(
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
 
-        children: [
+            children: bagianMap.entries.map(
+              (e) {
+                return Padding(
+                  padding:
+                      const EdgeInsets.only(
+                    bottom: 8,
+                  ),
 
-          const Text(
-
-            'Keterangan Singkatan',
-
-            style: TextStyle(
-
-              fontWeight: FontWeight.bold,
-
-              fontSize: 16,
-            ),
+                  child: Text(
+                    '${e.key} : ${e.value}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                );
+              },
+            ).toList(),
           ),
-
-          const SizedBox(height: 10),
-
-          ...bagianMap.entries.map(
-
-            (e) {
-
-              return Padding(
-
-                padding:
-                    const EdgeInsets.only(
-                  bottom: 6,
-                ),
-
-                child: Text(
-
-                  '${e.key} : ${e.value}',
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   // ======================================================
   // BUILD
@@ -745,27 +737,33 @@ class _PencapaianHafalan3PageState
 
                     const SizedBox(height: 10),
 
-                    Expanded(
+                              Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
 
-                      child: Padding(
+                    Padding(
+                      padding:
+                          const EdgeInsets.all(12),
 
-                        padding:
-                            const EdgeInsets.all(12),
+                      child: buildTable(
+                        bagianMap:
+                            bagianImrithi,
 
-                        child: buildTable(
-
-                          bagianMap:
-                              bagianImrithi,
-
-                          checklistData:
-                              checklistImrithi,
-                        ),
+                        checklistData:
+                            checklistImrithi,
                       ),
                     ),
 
                     buildKeterangan(
                       bagianImrithi,
                     ),
+
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
                   ],
                 ),
 
@@ -873,28 +871,33 @@ class _PencapaianHafalan3PageState
                     ),
 
                     const SizedBox(height: 10),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
 
-                    Expanded(
+                          Padding(
+                            padding:
+                                const EdgeInsets.all(12),
 
-                      child: Padding(
+                            child: buildTable(
+                              bagianMap:
+                                  bagianMaqsud,
 
-                        padding:
-                            const EdgeInsets.all(12),
+                              checklistData:
+                                  checklistMaqsud,
+                            ),
+                          ),
 
-                        child: buildTable(
+                          buildKeterangan(
+                            bagianMaqsud,
+                          ),
 
-                          bagianMap:
-                              bagianMaqsud,
-
-                          checklistData:
-                              checklistMaqsud,
-                        ),
+                          const SizedBox(height: 20),
+                        ],
                       ),
                     ),
-
-                    buildKeterangan(
-                      bagianMaqsud,
-                    ),
+),
                   ],
                 ),
               ],

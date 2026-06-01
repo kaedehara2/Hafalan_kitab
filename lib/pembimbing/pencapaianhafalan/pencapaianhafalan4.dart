@@ -223,88 +223,179 @@ class _PencapaianHafalan4PageState
   // CETAK PDF
   // =========================
 
-  Future<void> cetakPDF() async {
-    final pdf = pw.Document();
+ Future<void> cetakPDF() async {
+  final pdf = pw.Document();
 
-    pdf.addPage(
-      pw.MultiPage(
-        pageFormat: PdfPageFormat.a3.landscape,
+  final bagian1 =
+      bagianAlfiyah.keys.take(35).toList();
 
-        build: (pw.Context context) {
-          return [
-            pw.Text(
-              'Pencapaian Hafalan Nadzam Alfiyah',
-              style: pw.TextStyle(
-                fontSize: 22,
-                fontWeight: pw.FontWeight.bold,
-              ),
+  final bagian2 =
+      bagianAlfiyah.keys.skip(35).toList();
+
+  pdf.addPage(
+    pw.MultiPage(
+      pageFormat: PdfPageFormat.a3.landscape,
+
+      build: (context) => [
+
+        pw.Text(
+          'Pencapaian Hafalan Nadzam Alfiyah (AF1 - AF35)',
+          style: pw.TextStyle(
+            fontSize: 18,
+            fontWeight: pw.FontWeight.bold,
+          ),
+        ),
+
+        pw.SizedBox(height: 15),
+
+        pw.Table.fromTextArray(
+
+          cellAlignment:
+              pw.Alignment.center,
+
+          headerStyle: pw.TextStyle(
+            fontSize: 6,
+            fontWeight:
+                pw.FontWeight.bold,
+          ),
+
+          cellStyle:
+              const pw.TextStyle(
+            fontSize: 6,
+          ),
+
+          headers: [
+
+            'Nama',
+
+            ...bagian1.map(
+              (e) =>
+                  e.replaceAll('AF ', ''),
             ),
+          ],
 
-            pw.SizedBox(height: 20),
+          data: santriList.map((santri) {
 
-            pw.Table.fromTextArray(
-              cellStyle: const pw.TextStyle(
+            final nama =
+                santri['nama_lengkap'];
+
+            return [
+
+              nama,
+
+              ...bagian1.map((kode) {
+
+                return checklistData[nama]![kode] ==
+                        true
+                    ? '✓'
+                    : '';
+              }),
+            ];
+          }).toList(),
+        ),
+      ],
+    ),
+  );
+
+  pdf.addPage(
+    pw.MultiPage(
+      pageFormat: PdfPageFormat.a3.landscape,
+
+      build: (context) => [
+
+        pw.Text(
+          'Pencapaian Hafalan Nadzam Alfiyah (AF36 - AF69)',
+          style: pw.TextStyle(
+            fontSize: 18,
+            fontWeight: pw.FontWeight.bold,
+          ),
+        ),
+
+        pw.SizedBox(height: 15),
+
+        pw.Table.fromTextArray(
+
+          cellAlignment:
+              pw.Alignment.center,
+
+          headerStyle: pw.TextStyle(
+            fontSize: 6,
+            fontWeight:
+                pw.FontWeight.bold,
+          ),
+
+          cellStyle:
+              const pw.TextStyle(
+            fontSize: 6,
+          ),
+
+          headers: [
+
+            'Nama',
+
+            ...bagian2.map(
+              (e) =>
+                  e.replaceAll('AF ', ''),
+            ),
+          ],
+
+          data: santriList.map((santri) {
+
+            final nama =
+                santri['nama_lengkap'];
+
+            return [
+
+              nama,
+
+              ...bagian2.map((kode) {
+
+                return checklistData[nama]![kode] ==
+                        true
+                    ? '✓'
+                    : '';
+              }),
+            ];
+          }).toList(),
+        ),
+
+        pw.SizedBox(height: 25),
+
+        pw.Text(
+          'Keterangan Singkatan',
+          style: pw.TextStyle(
+            fontSize: 14,
+            fontWeight:
+                pw.FontWeight.bold,
+          ),
+        ),
+
+        pw.SizedBox(height: 10),
+
+        ...bagianAlfiyah.entries.map(
+          (e) => pw.Padding(
+            padding:
+                const pw.EdgeInsets.only(
+              bottom: 3,
+            ),
+            child: pw.Text(
+              '${e.key} : ${e.value}',
+              style:
+                  const pw.TextStyle(
                 fontSize: 8,
               ),
-
-              headerStyle: pw.TextStyle(
-                fontSize: 8,
-                fontWeight: pw.FontWeight.bold,
-              ),
-
-              headers: [
-                'Nama',
-                ...bagianAlfiyah.keys,
-              ],
-
-              data: santriList.map((santri) {
-                String nama = santri['nama_lengkap'];
-
-                return [
-                  nama,
-
-                  ...bagianAlfiyah.keys.map((kode) {
-                    return checklistData[nama]![kode] == true
-                        ? '✓'
-                        : '';
-                  }).toList(),
-                ];
-              }).toList(),
             ),
+          ),
+        ),
+      ],
+    ),
+  );
 
-            pw.SizedBox(height: 25),
-
-            pw.Text(
-              'Keterangan Singkatan:',
-              style: pw.TextStyle(
-                fontWeight: pw.FontWeight.bold,
-                fontSize: 12,
-              ),
-            ),
-
-            pw.SizedBox(height: 10),
-
-            ...bagianAlfiyah.entries.map(
-              (e) => pw.Padding(
-                padding: const pw.EdgeInsets.only(bottom: 4),
-                child: pw.Text(
-                  '${e.key} : ${e.value}',
-                  style: const pw.TextStyle(
-                    fontSize: 9,
-                  ),
-                ),
-              ),
-            ),
-          ];
-        },
-      ),
-    );
-
-    await Printing.layoutPdf(
-      onLayout: (format) async => pdf.save(),
-    );
-  }
-
+  await Printing.layoutPdf(
+    onLayout: (format) async =>
+        pdf.save(),
+  );
+}
   // =========================
   // BUILD TABLE
   // =========================
