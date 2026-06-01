@@ -20,16 +20,11 @@ class _ImrithiPageState extends State<ImrithiPage> {
   bool loadingRiwayat = false;
 
   List<Map<String, dynamic>> santriList = [];
-
   Map<String, dynamic>? selectedSantri;
-
   List<Map<String, dynamic>> riwayatHafalan = [];
 
-  final TextEditingController keteranganController =
-      TextEditingController();
-
-  final TextEditingController jumlahBaitController =
-      TextEditingController();
+  final TextEditingController keteranganController = TextEditingController();
+  final TextEditingController jumlahBaitController = TextEditingController();
 
   String? penilaian;
 
@@ -52,7 +47,6 @@ class _ImrithiPageState extends State<ImrithiPage> {
   // ================= FETCH SANTRI =================
   Future<void> fetchSantri() async {
     setState(() => loading = true);
-
     try {
       final data = await supabase
           .from('santri')
@@ -63,19 +57,14 @@ class _ImrithiPageState extends State<ImrithiPage> {
       if (!mounted) return;
 
       setState(() {
-        santriList =
-            List<Map<String, dynamic>>.from(data);
-
+        santriList = List<Map<String, dynamic>>.from(data);
         loading = false;
       });
     } catch (e) {
       setState(() => loading = false);
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            "Gagal mengambil data santri: $e",
-          ),
+          content: Text("Gagal mengambil data santri: $e"),
         ),
       );
     }
@@ -84,7 +73,6 @@ class _ImrithiPageState extends State<ImrithiPage> {
   // ================= FETCH RIWAYAT =================
   Future<void> fetchRiwayat(int santriId) async {
     setState(() => loadingRiwayat = true);
-
     try {
       final data = await supabase
           .from('hafalan_santri')
@@ -96,19 +84,14 @@ class _ImrithiPageState extends State<ImrithiPage> {
       if (!mounted) return;
 
       setState(() {
-        riwayatHafalan =
-            List<Map<String, dynamic>>.from(data);
-
+        riwayatHafalan = List<Map<String, dynamic>>.from(data);
         loadingRiwayat = false;
       });
     } catch (e) {
       setState(() => loadingRiwayat = false);
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            "Gagal mengambil riwayat: $e",
-          ),
+          content: Text("Gagal mengambil riwayat: $e"),
         ),
       );
     }
@@ -124,41 +107,27 @@ class _ImrithiPageState extends State<ImrithiPage> {
           .eq('kitab', 'imrithi');
 
       int totalBait = 0;
-
       for (var item in data) {
-        final jumlah = int.tryParse(
-              item['jumlah_bait'].toString(),
-            ) ??
-            0;
-
+        final jumlah = int.tryParse(item['jumlah_bait'].toString()) ?? 0;
         totalBait += jumlah;
       }
 
-      double progress =
-          (totalBait / totalTargetBait) * 100;
-
+      double progress = (totalBait / totalTargetBait) * 100;
       if (progress > 100) {
         progress = 100;
       }
-
       return progress;
     } catch (e) {
-      debugPrint(
-          "ERROR HITUNG PROGRESS : $e");
-
+      debugPrint("ERROR HITUNG PROGRESS : $e");
       return 0;
     }
   }
 
   // ================= CEK KHATAMAN =================
-  Future<void> cekDanKirimKhataman(
-      int santriId) async {
+  Future<void> cekDanKirimKhataman(int santriId) async {
     try {
-      final progress =
-          await getProgress(santriId);
-
-      debugPrint(
-          "PROGRESS IMRITHI : $progress");
+      final progress = await getProgress(santriId);
+      debugPrint("PROGRESS IMRITHI : $progress");
 
       if (progress >= 100) {
         final cekData = await supabase
@@ -167,107 +136,76 @@ class _ImrithiPageState extends State<ImrithiPage> {
             .eq('santri_id', santriId)
             .eq('kitab', 'imrithi');
 
-        // ================= BELUM MASUK =================
         if (cekData.isEmpty) {
-          await supabase
-              .from('setoran_khataman')
-              .insert({
+          await supabase.from('setoran_khataman').insert({
             'santri_id': santriId,
             'kitab': 'imrithi',
             'status': 'pending',
           });
 
-          debugPrint(
-              "BERHASIL MASUK KHATAMAN IMRITHI");
-
+          debugPrint("BERHASIL MASUK KHATAMAN IMRITHI");
           if (!mounted) return;
 
-          ScaffoldMessenger.of(context)
-              .showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              backgroundColor:
-                  Colors.green,
-              content: Text(
-                "Santri berhasil masuk setoran khataman",
-              ),
+              backgroundColor: Colors.green,
+              content: Text("Santri berhasil masuk setoran khataman"),
             ),
           );
         }
       }
     } catch (e) {
-      debugPrint(
-          "ERROR KHATAMAN IMRITHI : $e");
+      debugPrint("ERROR KHATAMAN IMRITHI : $e");
     }
   }
 
   // ================= INSERT HAFALAN =================
-  Future<void> insertHafalan(
-      int santriId) async {
+  Future<void> insertHafalan(int santriId) async {
     if (keteranganController.text.isEmpty ||
         jumlahBaitController.text.isEmpty ||
         penilaian == null) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content:
-              Text("Lengkapi data hafalan"),
+          content: Text("Lengkapi data hafalan"),
         ),
       );
-
       return;
     }
 
     try {
-      final jumlahBait = int.parse(
-        jumlahBaitController.text,
-      );
+      final jumlahBait = int.parse(jumlahBaitController.text);
 
-      await supabase
-          .from('hafalan_santri')
-          .insert({
+      await supabase.from('hafalan_santri').insert({
         'santri_id': santriId,
         'kitab': 'imrithi',
-        'bagian':
-            keteranganController.text,
+        'bagian': keteranganController.text,
         'jumlah_bait': jumlahBait,
         'status': penilaian,
-        'pembimbing_input':
-            widget.username,
+        'pembimbing_input': widget.username,
         'is_setoran_cadangan': false,
       });
 
-      // ================= REFRESH =================
       await fetchRiwayat(santriId);
-
       await fetchSantri();
-
-      // ================= CEK KHATAMAN =================
-      await cekDanKirimKhataman(
-          santriId);
+      await cekDanKirimKhataman(santriId);
 
       if (!mounted) return;
 
       setState(() {
         keteranganController.clear();
-
         jumlahBaitController.clear();
-
         penilaian = null;
       });
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content:
-              Text("Hafalan berhasil disimpan"),
+          content: Text("Hafalan berhasil disimpan"),
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text("Gagal menyimpan hafalan: $e"),
+          content: Text("Gagal menyimpan hafalan: $e"),
         ),
       );
     }
@@ -279,30 +217,22 @@ class _ImrithiPageState extends State<ImrithiPage> {
     required int santriId,
   }) async {
     try {
-      await supabase
-          .from('hafalan_santri')
-          .delete()
-          .eq('id', hafalanId);
+      await supabase.from('hafalan_santri').delete().eq('id', hafalanId);
 
       await fetchRiwayat(santriId);
-
       await fetchSantri();
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content:
-              Text("Catatan berhasil dihapus"),
+          content: Text("Catatan berhasil dihapus"),
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text("Gagal menghapus: $e"),
+          content: Text("Gagal menghapus: $e"),
         ),
       );
     }
@@ -313,156 +243,90 @@ class _ImrithiPageState extends State<ImrithiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            Colors.lime[400],
-
-        title: const Text(
-          "Kitab Imrithi - Catat Hafalan",
-        ),
-
+        backgroundColor: Colors.lime[400],
+        title: const Text("Kitab Imrithi - Catat Hafalan"),
         leading: selectedSantri != null
             ? IconButton(
-                icon: const Icon(
-                    Icons.arrow_back),
+                icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   setState(() {
                     selectedSantri = null;
-
                     riwayatHafalan.clear();
                   });
                 },
               )
             : null,
       ),
-
       body: loading
-          ? const Center(
-              child:
-                  CircularProgressIndicator(),
-            )
+          ? const Center(child: CircularProgressIndicator())
           : selectedSantri == null
               ? buildListSantri()
               : buildCatatanHafalan(),
     );
   }
 
-  // ================= LIST SANTRI =================
+  // ================= LIST SANTRI (REVISED TO ONE COLUMN & ONE LINE NAME) =================
   Widget buildListSantri() {
     return Padding(
-      padding:
-          const EdgeInsets.all(12),
-
-      child: GridView.builder(
-        itemCount:
-            santriList.length,
-
-        gridDelegate:
-            const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-
-          childAspectRatio: 1.5,
-
-          crossAxisSpacing: 10,
-
-          mainAxisSpacing: 10,
-        ),
-
+      padding: const EdgeInsets.all(12),
+      child: ListView.builder(
+        itemCount: santriList.length,
         itemBuilder: (context, i) {
-          final santri =
-              santriList[i];
+          final santri = santriList[i];
 
           return FutureBuilder<double>(
-            future:
-                getProgress(santri['id']),
-
-            builder:
-                (context, snapshot) {
-              double progress =
-                  snapshot.data ?? 0;
+            future: getProgress(santri['id']),
+            builder: (context, snapshot) {
+              double progress = snapshot.data ?? 0;
 
               return InkWell(
                 onTap: () async {
                   setState(() {
-                    selectedSantri =
-                        santri;
+                    selectedSantri = santri;
                   });
-
-                  await fetchRiwayat(
-                      santri['id']);
+                  await fetchRiwayat(santri['id']);
                 },
-
                 child: Container(
-                  padding:
-                      const EdgeInsets.all(
-                          16),
-
-                  decoration:
-                      BoxDecoration(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
                     color: Colors.white,
-
-                    borderRadius:
-                        BorderRadius.circular(
-                            22),
-
-                    border:
-                        Border.all(width: 2),
+                    borderRadius: BorderRadius.circular(22),
+                    border: Border.all(width: 2),
                   ),
-
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
-
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                    "${santri['nama_lengkap']} | ${santri['kelas']}",
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                      const SizedBox(
-                          height: 14),
-
-                      const Text(
-                          "Progres"),
-
-                      const SizedBox(
-                          height: 6),
-
+                        "${santri['nama_lengkap']} | Kelas ${santri['kelas']}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      const Text("Progres Hafalan"),
+                      const SizedBox(height: 6),
                       Row(
                         children: [
                           Expanded(
-                            child:
-                                ClipRRect(
-                              borderRadius:
-                                  BorderRadius.circular(
-                                      12),
-
-                              child:
-                                  LinearProgressIndicator(
-                                value:
-                                    progress /
-                                        100,
-
-                                minHeight:
-                                    8,
-
-                                backgroundColor:
-                                    Colors.grey[
-                                        300],
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: LinearProgressIndicator(
+                                value: progress / 100,
+                                minHeight: 8,
+                                backgroundColor: Colors.grey[300],
                               ),
                             ),
                           ),
-
-                          const SizedBox(
-                              width: 10),
-
+                          const SizedBox(width: 10),
                           Text(
                             "${progress.toInt()}%",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
@@ -479,141 +343,68 @@ class _ImrithiPageState extends State<ImrithiPage> {
 
   // ================= CATAT HAFALAN =================
   Widget buildCatatanHafalan() {
-    final santriId =
-        selectedSantri!['id'];
+    final santriId = selectedSantri!['id'];
 
     return SingleChildScrollView(
-      padding:
-          const EdgeInsets.all(16),
-
+      padding: const EdgeInsets.all(16),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            selectedSantri![
-                'nama_lengkap'],
-
-            style:
-                const TextStyle(
+            selectedSantri!['nama_lengkap'],
+            style: const TextStyle(
               fontSize: 20,
-
-              fontWeight:
-                  FontWeight.bold,
+              fontWeight: FontWeight.bold,
             ),
           ),
-
-          const SizedBox(
-              height: 20),
-
-          // ================= KETERANGAN =================
+          const SizedBox(height: 20),
           TextField(
-            controller:
-                keteranganController,
-
+            controller: keteranganController,
             maxLines: 4,
-
-            decoration:
-                InputDecoration(
-              labelText:
-                  "Keterangan Hafalan",
-
-              hintText:
-                  "Contoh:\nBab Al-Kalam sampai Bab I'rab",
-
-              border:
-                  OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(
-                        14),
+            decoration: InputDecoration(
+              labelText: "Keterangan Hafalan",
+              hintText: "Contoh:\nBab Al-Kalam sampai Bab I'rab",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
           ),
-
-          const SizedBox(
-              height: 20),
-
-          // ================= JUMLAH BAIT =================
+          const SizedBox(height: 20),
           TextField(
-            controller:
-                jumlahBaitController,
-
-            keyboardType:
-                TextInputType.number,
-
-            decoration:
-                InputDecoration(
-              labelText:
-                  "Jumlah Bait",
-
-              hintText:
-                  "Masukkan jumlah bait",
-
-              border:
-                  OutlineInputBorder(
-                borderRadius:
-                    BorderRadius.circular(
-                        14),
+            controller: jumlahBaitController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(
+              labelText: "Jumlah Bait",
+              hintText: "Masukkan jumlah bait",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
           ),
-
-          const SizedBox(
-              height: 20),
-
-          // ================= STATUS =================
+          const SizedBox(height: 20),
           Card(
-            shape:
-                RoundedRectangleBorder(
-              borderRadius:
-                  BorderRadius.circular(
-                      16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-
             child: Column(
               children: [
                 RadioListTile(
-                  title:
-                      const Text(
-                          "Lancar"),
-
-                  value:
-                      "Lancar",
-
-                  groupValue:
-                      penilaian,
-
-                  activeColor:
-                      Colors.lime[
-                          700],
-
-                  onChanged:
-                      (v) {
+                  title: const Text("Lancar"),
+                  value: "Lancar",
+                  groupValue: penilaian,
+                  activeColor: Colors.lime[700],
+                  onChanged: (v) {
                     setState(() {
                       penilaian = v;
                     });
                   },
                 ),
-
                 RadioListTile(
-                  title:
-                      const Text(
-                    "Kurang Lancar",
-                  ),
-
-                  value:
-                      "Kurang Lancar",
-
-                  groupValue:
-                      penilaian,
-
-                  activeColor:
-                      Colors.lime[
-                          700],
-
-                  onChanged:
-                      (v) {
+                  title: const Text("Kurang Lancar"),
+                  value: "Kurang Lancar",
+                  groupValue: penilaian,
+                  activeColor: Colors.lime[700],
+                  onChanged: (v) {
                     setState(() {
                       penilaian = v;
                     });
@@ -622,225 +413,102 @@ class _ImrithiPageState extends State<ImrithiPage> {
               ],
             ),
           ),
-
-          const SizedBox(
-              height: 20),
-
-          // ================= BUTTON =================
+          const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
-
             height: 50,
-
             child: ElevatedButton(
-              style:
-                  ElevatedButton.styleFrom(
-                backgroundColor:
-                    Colors.lime[400],
-
-                shape:
-                    RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(
-                          14),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.lime[400],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
                 ),
               ),
-
-              onPressed:
-                  penilaian == null
-                      ? null
-                      : () =>
-                          insertHafalan(
-                            santriId,
-                          ),
-
+              onPressed: penilaian == null ? null : () => insertHafalan(santriId),
               child: const Text(
                 "Simpan Hafalan",
-
                 style: TextStyle(
-                  color:
-                      Colors.black,
-
-                  fontWeight:
-                      FontWeight.bold,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ),
-
-          const SizedBox(
-              height: 30),
-
-          // ================= RIWAYAT =================
+          const SizedBox(height: 30),
           const Text(
             "Riwayat Hafalan",
-
             style: TextStyle(
-              fontWeight:
-                  FontWeight.bold,
-
+              fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
           ),
-
-          const SizedBox(
-              height: 10),
-
+          const SizedBox(height: 10),
           loadingRiwayat
               ? const Padding(
-                  padding:
-                      EdgeInsets.all(
-                          16),
-
-                  child:
-                      CircularProgressIndicator(),
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(),
                 )
               : riwayatHafalan.isEmpty
-                  ? const Text(
-                      "Belum ada catatan",
-                    )
+                  ? const Text("Belum ada catatan")
                   : SingleChildScrollView(
-                      scrollDirection:
-                          Axis.horizontal,
-
+                      scrollDirection: Axis.horizontal,
                       child: DataTable(
                         columns: const [
-                          DataColumn(
-                              label:
-                                  Text("No")),
-
-                          DataColumn(
-                              label:
-                                  Text("Tanggal")),
-
-                          DataColumn(
-                              label:
-                                  Text("Hafalan")),
-
-                          DataColumn(
-                              label:
-                                  Text("Jumlah")),
-
-                          DataColumn(
-                              label:
-                                  Text("Status")),
-
-                          DataColumn(
-                              label:
-                                  Text("Aksi")),
+                          DataColumn(label: Text("No")),
+                          DataColumn(label: Text("Tanggal")),
+                          DataColumn(label: Text("Hafalan")),
+                          DataColumn(label: Text("Jumlah")),
+                          DataColumn(label: Text("Status")),
+                          DataColumn(label: Text("Aksi")),
                         ],
-
                         rows: List.generate(
-                          riwayatHafalan
-                              .length,
+                          riwayatHafalan.length,
                           (i) {
-                            final item =
-                                riwayatHafalan[
-                                    i];
-
-                            final tgl =
-                                DateTime.parse(
-                              item[
-                                  'tanggal'],
-                            );
+                            final item = riwayatHafalan[i];
+                            final tgl = DateTime.parse(item['tanggal']);
 
                             return DataRow(
                               cells: [
+                                DataCell(Text("${i + 1}")),
                                 DataCell(
-                                  Text(
-                                      "${i + 1}"),
+                                  Text("${tgl.day}/${tgl.month}/${tgl.year}"),
                                 ),
-
-                                DataCell(
-                                  Text(
-                                    "${tgl.day}/${tgl.month}/${tgl.year}",
-                                  ),
-                                ),
-
-                                DataCell(
-                                  Text(
-                                      item[
-                                          'bagian']),
-                                ),
-
-                                DataCell(
-                                  Text(
-                                    "${item['jumlah_bait']} bait",
-                                  ),
-                                ),
-
-                                DataCell(
-                                  Text(
-                                      item[
-                                          'status']),
-                                ),
-
+                                DataCell(Text(item['bagian'])),
+                                DataCell(Text("${item['jumlah_bait']} bait")),
+                                DataCell(Text(item['status'])),
                                 DataCell(
                                   IconButton(
-                                    icon:
-                                        const Icon(
+                                    icon: const Icon(
                                       Icons.delete,
-
-                                      color:
-                                          Colors.red,
+                                      color: Colors.red,
                                     ),
-
-                                    onPressed:
-                                        () {
+                                    onPressed: () {
                                       showDialog(
-                                        context:
-                                            context,
-
-                                        builder:
-                                            (_) =>
-                                                AlertDialog(
-                                          title:
-                                              const Text(
-                                            "Hapus Catatan",
-                                          ),
-
-                                          content:
-                                              const Text(
+                                        context: context,
+                                        builder: (_) => AlertDialog(
+                                          title: const Text("Hapus Catatan"),
+                                          content: const Text(
                                             "Yakin ingin menghapus catatan hafalan?",
                                           ),
-
                                           actions: [
                                             TextButton(
-                                              onPressed:
-                                                  () {
-                                                Navigator.pop(
-                                                    context);
+                                              onPressed: () {
+                                                Navigator.pop(context);
                                               },
-
-                                              child:
-                                                  const Text(
-                                                      "Batal"),
+                                              child: const Text("Batal"),
                                             ),
-
                                             ElevatedButton(
-                                              style:
-                                                  ElevatedButton.styleFrom(
-                                                backgroundColor:
-                                                    Colors.red,
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.red,
                                               ),
-
-                                              onPressed:
-                                                  () async {
-                                                Navigator.pop(
-                                                    context);
-
+                                              onPressed: () async {
+                                                Navigator.pop(context);
                                                 await deleteHafalan(
-                                                  hafalanId:
-                                                      item['id'],
-
-                                                  santriId:
-                                                      santriId,
+                                                  hafalanId: item['id'],
+                                                  santriId: santriId,
                                                 );
                                               },
-
-                                              child:
-                                                  const Text(
-                                                      "Hapus"),
+                                              child: const Text("Hapus"),
                                             ),
                                           ],
                                         ),
