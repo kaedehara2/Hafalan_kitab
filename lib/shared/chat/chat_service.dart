@@ -65,15 +65,22 @@ class ChatService {
   }
 
   /// Ambil semua pesan
-  Future<List<dynamic>> getMessages(int roomId) async {
-    final messages = await supabase
-        .from('chat_messages')
-        .select()
-        .eq('room_id', roomId)
-        .order('created_at');
+  Future<List<dynamic>> getMessages(
+  int roomId,
+) async {
 
-    return messages;
-  }
+  final messages =
+      await supabase
+          .from('chat_messages')
+          .select()
+          .eq('room_id', roomId)
+          .order(
+            'id',
+            ascending: true,
+          );
+
+  return messages;
+}
 
   /// Kirim pesan
   Future<void> sendMessage({

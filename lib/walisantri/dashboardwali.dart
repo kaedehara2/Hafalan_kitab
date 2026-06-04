@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'monitoringhafalan.dart';
 import 'riwayatkhataman.dart';
 import 'package:hafalan_kitab/login.dart';
+import 'chat/chat_page_wali.dart';
 
 class DashboardWaliPage extends StatefulWidget {
 
@@ -900,6 +901,51 @@ Future<void> loadProgressKitab(
                           ),
                         ],
                       ),
+                      const SizedBox(height: 16),
+
+InkWell(
+  borderRadius: BorderRadius.circular(22),
+
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ChatPageWali(
+          waliId: widget.waliId,
+          namaWali: widget.namaWali,
+        ),
+      ),
+    );
+  },
+
+  child: Container(
+    width: double.infinity,
+
+    padding: const EdgeInsets.all(20),
+
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(22),
+    ),
+
+    child: const Column(
+      children: [
+
+        Icon(
+          Icons.chat,
+          size: 42,
+        ),
+
+        SizedBox(height: 12),
+
+        Text(
+          'Chat Pembimbing',
+          textAlign: TextAlign.center,
+        ),
+      ],
+    ),
+  ),
+),
                     ],
                   ),
                 ),

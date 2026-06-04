@@ -13,6 +13,7 @@ import 'pencapaianhafalan/pencapaianhafalan1.dart';
 import 'pencapaianhafalan/pencapaianhafalan2.dart';
 import 'pencapaianhafalan/pencapaianhafalan3.dart';
 import 'pencapaianhafalan/pencapaianhafalan4.dart';
+import 'chat_wali/chat_list_pembimbing_page.dart';
 
 class DashboardPage extends StatefulWidget {
 
@@ -713,6 +714,40 @@ class _DashboardPageState
             ),
 
             const Divider(),
+            const Divider(),
+
+// ================= CHAT WALI SANTRI =================
+ListTile(
+
+  leading: const Icon(
+    Icons.chat,
+    color: Colors.blue,
+  ),
+
+  title: const Text(
+    'Chat Wali Santri',
+  ),
+
+  onTap: () {
+
+    Navigator.pop(context);
+
+    Navigator.push(
+
+      context,
+
+      MaterialPageRoute(
+
+        builder: (_) =>
+            ChatListPembimbingPage(
+
+          idPembimbing:
+              widget.idPembimbing,
+        ),
+      ),
+    );
+  },
+),
 
             // ================= SETORAN CADANGAN =================
             ListTile(

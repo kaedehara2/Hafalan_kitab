@@ -47,33 +47,46 @@ class _ChatRoomPageState
     listenRealtime();
   }
 
-  Future<void> loadMessages() async {
-    try {
-      final data =
-          await chatService.getMessages(
-        widget.roomId,
-      );
+Future<void> loadMessages() async {
+  try {
+    final data =
+        await chatService.getMessages(
+      widget.roomId,
+    );
 
-      setState(() {
-        messages = data;
-        isLoading = false;
-      });
-    } catch (e) {
+    debugPrint(
+      'JUMLAH PESAN = ${data.length}',
+    );
+
+    for (final item in data) {
       debugPrint(
-        'Error load messages: $e',
+        item['message'].toString(),
       );
-
-      setState(() {
-        isLoading = false;
-      });
     }
+
+    setState(() {
+      messages = data;
+      isLoading = false;
+    });
+  } catch (e) {
+    debugPrint(
+      'Error load messages: $e',
+    );
+
+    setState(() {
+      isLoading = false;
+    });
   }
+}
 
   void listenRealtime() {
     channel =
         chatService.subscribeMessages(
       roomId: widget.roomId,
       onNewMessage: (newMessage) {
+         debugPrint(
+        'Realtime message: $newMessage',
+      );
         setState(() {
           messages.add(newMessage);
         });
@@ -81,28 +94,36 @@ class _ChatRoomPageState
     );
   }
 
-  Future<void> sendMessage() async {
-    final text =
-        messageController.text.trim();
+Future<void> sendMessage() async {
+  final text =
+      messageController.text.trim();
 
-    if (text.isEmpty) return;
+  if (text.isEmpty) return;
 
-    await chatService.sendMessage(
-      roomId: widget.roomId,
-      senderRole: widget.senderRole,
-      senderId: widget.senderId,
-      message: text,
-    );
+  await chatService.sendMessage(
+    roomId: widget.roomId,
+    senderRole: widget.senderRole,
+    senderId: widget.senderId,
+    message: text,
+  );
 
-    messageController.clear();
-  }
+  await loadMessages();
+
+  messageController.clear();
+}
 
   @override
-  void dispose() {
-    messageController.dispose();
+ @override
+void dispose() {
 
-    super.dispose();
+  if (channel != null) {
+    channel.unsubscribe();
   }
+
+  messageController.dispose();
+
+  super.dispose();
+}
 
   Widget buildMessageBubble(
       Map<String, dynamic> message) {
@@ -164,24 +185,37 @@ class _ChatRoomPageState
       ),
       body: Column(
         children: [
-          Expanded(
-            child: isLoading
-                ? const Center(
-                    child:
-                        CircularProgressIndicator(),
-                  )
-                : ListView.builder(
-                    itemCount:
-                        messages.length,
-                    itemBuilder:
-                        (context, index) {
-                      return buildMessageBubble(
-                        messages[index],
-                      );
-                    },
-                  ),
-          ),
+         Expanded(
+  child: isLoading
+      ? const Center(
+          child: CircularProgressIndicator(),
+        )
+      : Builder(
+          builder: (context) {
 
+            debugPrint(
+              'TOTAL BUBBLE = ${messages.length}',
+            );
+
+            return ListView.builder(
+              itemCount: messages.length,
+
+              itemBuilder: (context, index) {
+
+                debugPrint(
+                  'Bubble ke-$index = ${messages[index]['message']}',
+                );
+
+                return buildMessageBubble(
+                  Map<String, dynamic>.from(
+                    messages[index],
+                  ),
+                );
+              },
+            );
+          },
+        ),
+),
           const Divider(height: 1),
 
           Padding(
