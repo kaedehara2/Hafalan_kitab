@@ -324,7 +324,7 @@ class _AwamilPageState extends State<AwamilPage> {
         itemCount: santriList.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 2.6,
+          childAspectRatio: 2.3,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
         ),
@@ -356,8 +356,10 @@ class _AwamilPageState extends State<AwamilPage> {
                     children: [
                       Text(
                         "${santri['nama_lengkap']} | ${santri['kelas']}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

@@ -80,8 +80,11 @@ class PilihKitabPage extends StatelessWidget {
                     context,
 
                     MaterialPageRoute(
-                      builder: (_) =>
-                          const BabulMinanPage(),
+                       builder: (_) =>
+                          BabulMinanPage(
+                            username: username,
+                          ),
+
                     ),
                   );
                 },

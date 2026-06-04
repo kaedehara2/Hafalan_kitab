@@ -362,7 +362,7 @@ class _JurumiyahPageState extends State<JurumiyahPage> {
         itemCount: santriList.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 2.6,
+          childAspectRatio: 2.3,
           crossAxisSpacing: 10,
           mainAxisSpacing: 10,
         ),
@@ -393,12 +393,14 @@ class _JurumiyahPageState extends State<JurumiyahPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${santri['nama_lengkap']} | ${santri['kelas']}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      "${santri['nama_lengkap']} | ${santri['kelas']}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
 
                       const SizedBox(height: 14),
 
