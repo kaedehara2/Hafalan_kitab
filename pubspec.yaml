@@ -23,33 +23,45 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  flutter_launcher_icons: ^0.14.4 # ✅ Dipindahkan ke dev_dependencies tanpa mengubah versi
+  flutter_launcher_icons: ^0.14.4
 
+# ◄ REVISI KONFIGURASI SPLASH SCREEN ►
 flutter_native_splash:
-  image: "assets/logobaru.png"
+  color: "#FFFFFF"          # Latar belakang putih bersih
+  image: "assets/logobaru.png" # File baru hasil ekspor Figma kamu
   android: true
+  ios: true
   fullscreen: true
+
+  # Setelan khusus Android 12 ke atas
+  android_12:
+    color: "#FFFFFF"
+    image: "assets/logobaru.png"
 
 flutter:
   uses-material-design: true
   assets: 
     - assets/logobaru.png
+    - assets/logobaru1.png
 
+# ◄ REVISI KONFIGURASI IKON APLIKASI (OPSIONAL TAPI DISARANKAN) ►
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/logobaru.png"
   min_sdk_android: 21
   
-  # Tambahkan dua baris ini untuk Android modern:
-  adaptive_icon_background: "#FFFFFF" # Warna latar belakang ikon (misal: Putih)
-  adaptive_icon_foreground: "assets/logobaru.png" # Gambar utama logo Anda
-  
+  # Untuk ikon aplikasilanskap, berikan margin latar belakang agar ikon lanskap
+  # terlihat utuh di dalam bentuk adaptif (lingkaran/kotak) ponsel.
+  # Gunakan gambar ikon yang sudah diperkecil (dengan padding) sebagai foreground.
+  adaptive_icon_background: "#FFFFFF" # Warna latar belakang ikon
+  adaptive_icon_foreground: "assets/logobaru.png" # Gambar utama ikon Anda
+
   web:
     generate: true
     image_path: "assets/logobaru.png"
-    background_color: "#hexcode"
-    theme_color: "#hexcode"
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"
   windows:
     generate: true
     image_path: "assets/logobaru.png"

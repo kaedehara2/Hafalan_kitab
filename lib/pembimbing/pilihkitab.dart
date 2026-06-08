@@ -139,7 +139,7 @@ class PilihKitabPage extends StatelessWidget {
                   _buildKitabCard(
                     context,
                     title: "Kitab Nadhom Imrithi",
-                    subtitle: "Nahw Nadzam Per-Bait",
+                    subtitle: "Nahwu Nadzam Per-Bait",
                     onTap: () {
 
                       Navigator.push(
@@ -162,7 +162,7 @@ class PilihKitabPage extends StatelessWidget {
               _buildKitabCard(
                 context,
                 title: "Kitab Nadhom Maqsud",
-                subtitle: "Dalam Pengembangan",
+                subtitle: "Sharaf Nadzam Per-Bait",
                 onTap: () {
 
                   Navigator.push(

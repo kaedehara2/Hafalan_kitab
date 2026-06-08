@@ -335,27 +335,23 @@ class _BabulMinanPageState extends State<BabulMinanPage> {
     );
   }
 
-  // ================= LIST SANTRI =================
+// ================= LIST SANTRI (1 KOLOM) =================
   Widget buildListSantri() {
-    return Padding(
+    return ListView.builder(
       padding: const EdgeInsets.all(12),
-      child: GridView.builder(
-        itemCount: santriList.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 2.3,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemBuilder: (context, i) {
-          final santri = santriList[i];
+      itemCount: santriList.length,
+      itemBuilder: (context, i) {
+        final santri = santriList[i];
 
-          return FutureBuilder<double>(
-            future: getProgress(santri['id']),
-            builder: (context, snapshot) {
-              double progress = snapshot.data ?? 0;
+        return FutureBuilder<double>(
+          future: getProgress(santri['id']),
+          builder: (context, snapshot) {
+            double progress = snapshot.data ?? 0;
 
-              return InkWell(
+            return Padding(
+              // Memberikan jarak antar card secara vertikal
+              padding: const EdgeInsets.only(bottom: 12), 
+              child: InkWell(
                 onTap: () async {
                   setState(() {
                     selectedSantri = santri;
@@ -378,14 +374,17 @@ class _BabulMinanPageState extends State<BabulMinanPage> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 16, // Sedikit diperbesar agar pas dengan layout 1 kolom
                           fontWeight: FontWeight.bold,
                         ),
                       ),
 
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
 
-                      const Text("Progres"),
+                      const Text(
+                        "Progres",
+                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                      ),
 
                       const SizedBox(height: 6),
 
@@ -398,23 +397,27 @@ class _BabulMinanPageState extends State<BabulMinanPage> {
                                 value: progress / 100,
                                 minHeight: 8,
                                 backgroundColor: Colors.grey[300],
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.lime[700]!,
+                                ),
                               ),
                             ),
                           ),
-
-                          const SizedBox(width: 10),
-
-                          Text("${progress.toInt()}%"),
+                          const SizedBox(width: 12),
+                          Text(
+                            "${progress.toInt()}%",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ],
                       ),
                     ],
                   ),
                 ),
-              );
-            },
-          );
-        },
-      ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
