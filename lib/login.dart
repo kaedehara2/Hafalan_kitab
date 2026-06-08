@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 import 'package:hafalan_kitab/pembimbing/dashboard.dart';
 import 'package:hafalan_kitab/admin/dashboardadmin.dart';
-import 'package:hafalan_kitab/walisantri/dashboardwali.dart'; // 🛠️ FIX ERROR 1 & 2: Jalur import dipindahkan ke folder walisantri
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'daftarakun.dart';
+import 'package:hafalan_kitab/walisantri/dashboardwali.dart';
 import 'bantuanlogin.dart';
 
 class Login extends StatefulWidget {
@@ -15,26 +14,43 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final supabase = Supabase.instance.client;
 
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+    final supabase = Supabase.instance.client;
+
+  final TextEditingController usernameController =
+      TextEditingController();
+
+  final TextEditingController passwordController =
+      TextEditingController();
 
   bool isObscure = true;
   bool isLoading = false;
 
-  // ================= FUNCTION LOGIN =================
+  // ================= LOGIN =================
   Future<void> _login() async {
-    String username = usernameController.text.trim().toLowerCase();
-    String password = passwordController.text.trim();
 
-    // ================= VALIDASI INPUT =================
-    if (username.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+    String username =
+        usernameController.text
+            .trim()
+            .toLowerCase();
+
+    String password =
+        passwordController.text
+            .trim();
+
+    // ================= VALIDASI =================
+    if (username.isEmpty ||
+        password.isEmpty) {
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
         const SnackBar(
-          content: Text("Username dan password wajib diisi"),
+          content: Text(
+            "Username dan password wajib diisi",
+          ),
         ),
       );
+
       return;
     }
 
@@ -43,130 +59,186 @@ class _LoginState extends State<Login> {
     });
 
     try {
-      debugPrint('USERNAME INPUT : $username');
-      debugPrint('PASSWORD INPUT : $password');
 
-      // ================= QUERY LOGIN AKTOR: PEMBIMBING / ADMIN =================
-      final response = await supabase
-          .from('pembimbing')
-          .select(
-            '''
-            id,
-            username,
-            nama_lengkap,
-            marhalah,
-            password,
-            role
-            ''',
-          )
-          .eq('username', username)
-          .maybeSingle();
+      print('USERNAME INPUT : $username');
+      print('PASSWORD INPUT : $password');
 
-      debugPrint('HASIL QUERY PEMBIMBING/ADMIN : $response');
+      // ================= QUERY LOGIN =================
+      final response =
+          await Supabase.instance.client
+              .from('pembimbing')
+              .select(
+                '''
+                id,
+                username,
+                nama_lengkap,
+                marhalah,
+                password,
+                role
+                ''',
+              )
+              .eq('username', username)
+              .maybeSingle();
 
-      // ================= JIKA USER DITEMUKAN DI TABEL PEMBIMBING =================
+      print('HASIL QUERY : $response');
+
+      // ================= CEK USER =================
       if (response != null) {
-        // Verifikasi Password
+
+        // ================= CEK PASSWORD =================
         if (response['password'] == password) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Login berhasil")),
+
+          ScaffoldMessenger.of(context)
+              .showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Login berhasil",
+              ),
+            ),
           );
 
-          final role = response['role'] ?? 'pembimbing';
+          // ================= ROLE =================
+          final role =
+              response['role'] ?? 'pembimbing';
 
-          // Arahkan Sesuai Role
+          // ================= LOGIN ADMIN =================
           if (role == 'admin') {
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const DashboardAdminPage(),
+                builder: (context) =>
+                    const DashboardAdminPage(),
               ),
             );
-          } else {
+
+          }
+
+          // ================= LOGIN PEMBIMBING =================
+          else {
+
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => DashboardPage(
-                  idPembimbing: response['id'],
-                  username: response['username'],
-                  marhalah: response['marhalah'],
+
+                  idPembimbing:
+                      response['id'],
+
+                  username:
+                      response['username'],
+
+                  marhalah:
+                      response['marhalah'],
                 ),
               ),
             );
           }
+
         } else {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Password salah")),
-          );
-        }
-      } 
-      // ================= JIKA TIDAK DITEMUKAN, CEK TABEL WALI SANTRI =================
-      else {
-        final wali = await supabase
-            .from('wali_santri')
-            .select()
-            .eq('username', username)
-            .eq('password', password)
-            .maybeSingle();
 
-        debugPrint('HASIL QUERY WALI SANTRI : $wali');
-
-        if (wali != null) {
-          if (!mounted) return;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DashboardWaliPage(
-                waliId: wali['id'].toString(),
-                namaWali: wali['nama_wali'] ?? 'Wali Santri',
+          ScaffoldMessenger.of(context)
+              .showSnackBar(
+            const SnackBar(
+              content: Text(
+                "Password salah",
               ),
             ),
           );
+        }
+
+      } else {
+
+        // ================= LOGIN WALI SANTRI =================
+        final wali = await supabase
+            .from('wali_santri')
+            .select()
+            .eq('username', usernameController.text)
+            .eq('password', passwordController.text)
+            .maybeSingle();
+
+        if (wali != null) {
+
+          Navigator.pushReplacement(
+
+            context,
+
+            MaterialPageRoute(
+
+              builder: (_) => DashboardWaliPage(
+
+                waliId: wali['id'].toString(),
+
+                namaWali: wali['nama_wali'],
+              ),
+            ),
+          );
+
           return;
         }
 
-        // Jika data benar-benar tidak ada di kedua tabel
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Username tidak ditemukan")),
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Username tidak ditemukan",
+            ),
+          ),
         );
       }
+
     } catch (e) {
-      debugPrint('ERROR LOGIN : $e');
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Gagal login: $e")),
+
+      print('ERROR LOGIN : $e');
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+        SnackBar(
+          content: Text(
+            "Gagal login: $e",
+          ),
+        ),
       );
+
     } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
+
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // ================= LOGO BARU (OPTIMAL & UTUH) =================
-              Image.asset(
-                'assets/logobaru.png',
-                width: 280, 
-                fit: BoxFit.contain,
-              ),
-              const SizedBox(height: 10),
 
-              // ================= JUDUL INTERFACE =================
+    return Scaffold(
+
+      backgroundColor:
+          const Color(0xFFF5F5F5),
+
+      body: Center(
+
+        child: SingleChildScrollView(
+
+          padding:
+              const EdgeInsets.all(24.0),
+
+          child: Column(
+
+            mainAxisAlignment:
+                MainAxisAlignment.center,
+
+            children: [
+
+              // ================= LOGO =================
+              Image.asset(
+                'assets/logobaru1.png',
+                height: 100,
+              ),
+
+              const SizedBox(height: 20),
+
+              // ================= JUDUL =================
               const Text(
                 'Login',
                 style: TextStyle(
@@ -174,30 +246,57 @@ class _LoginState extends State<Login> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+
               const SizedBox(height: 30),
 
-              // ================= TEXTFIELD: USERNAME =================
+              // ================= USERNAME =================
               TextField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
+
+                controller:
+                    usernameController,
+
+                decoration:
+                    const InputDecoration(
+
+                  labelText:
+                      'Username',
+
+                  border:
+                      OutlineInputBorder(),
                 ),
               ),
+
               const SizedBox(height: 20),
 
-              // ================= TEXTFIELD: PASSWORD =================
+              // ================= PASSWORD =================
               TextField(
-                controller: passwordController,
-                obscureText: isObscure,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
+
+                controller:
+                    passwordController,
+
+                obscureText:
+                    isObscure,
+
+                decoration:
+                    InputDecoration(
+
+                  labelText:
+                      'Password',
+
+                  border:
+                      const OutlineInputBorder(),
+
+                  suffixIcon:
+                      IconButton(
+
                     icon: Icon(
-                      isObscure ? Icons.visibility : Icons.visibility_off,
+                      isObscure
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
+
                     onPressed: () {
+
                       setState(() {
                         isObscure = !isObscure;
                       });
@@ -205,61 +304,91 @@ class _LoginState extends State<Login> {
                   ),
                 ),
               ),
+
               const SizedBox(height: 30),
 
-              // ================= TOMBOL MASUK =================
+              // ================= BUTTON LOGIN =================
               SizedBox(
-                width: double.infinity,
+
+                width:
+                    double.infinity,
+
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : _login,
-                  child: isLoading
-                      ? const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.deepPurple,
-                            strokeWidth: 3,
-                          ),
-                        )
-                      : const Text('Masuk'),
+
+                  onPressed:
+                      isLoading
+                          ? null
+                          : _login,
+
+                  child:
+                      isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : const Text(
+                              'Masuk',
+                            ),
                 ),
               ),
 
-              // ================= LINK: BANTUAN AKUN =================
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const BantuanLoginPage(),
+              // ================= LUPA USERNAME PASSWORD =================
+                TextButton(
+
+                  onPressed: () {
+
+                    Navigator.push(
+
+                      context,
+
+                      MaterialPageRoute(
+
+                        builder: (_) =>
+                            const BantuanLoginPage(),
+                      ),
+                    );
+                  },
+
+                  child: const Text(
+
+                    'Lupa Username/Password?',
+
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w500,
                     ),
-                  );
-                },
-                child: const Text(
-                  'Lupa Username/Password?',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
 
-              // ================= LINK: REGISTRASI AKUN =================
+                const SizedBox(height: 10),
+
+              // ================= DAFTAR =================
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+
+                mainAxisAlignment:
+                    MainAxisAlignment.center,
+
                 children: [
-                  const Text("Belum punya akun?"),
+
+                  const Text(
+                    "Belum punya akun?",
+                  ),
+
                   TextButton(
+
                     onPressed: () {
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const DaftarAkun(),
+                          builder: (context) =>
+                              const DaftarAkun(),
                         ),
                       );
                     },
-                    child: const Text("Daftar"),
+
+                    child: const Text(
+                      "Daftar",
+                    ),
                   ),
                 ],
               ),
