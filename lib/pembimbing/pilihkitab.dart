@@ -53,7 +53,7 @@ class PilihKitabPage extends StatelessWidget {
               _buildKitabCard(
                 context,
                 title: "Kitab Awamil",
-                subtitle: "Dasar Nahwu",
+                subtitle: "Nahwu 1",
                 onTap: () {
 
                   Navigator.push(
@@ -73,7 +73,7 @@ class PilihKitabPage extends StatelessWidget {
               _buildKitabCard(
                 context,
                 title: "Kitab Babul Minan",
-                subtitle: "Marhalah 1",
+                subtitle: "Fiqih",
                 onTap: () {
 
                   Navigator.push(
@@ -107,7 +107,7 @@ class PilihKitabPage extends StatelessWidget {
               _buildKitabCard(
                 context,
                 title: "Kitab Jurumiyah",
-                subtitle: "Nahwu Menengah",
+                subtitle: "Nahwu 2",
                 onTap: () {
 
                   Navigator.push(
@@ -139,7 +139,7 @@ class PilihKitabPage extends StatelessWidget {
                   _buildKitabCard(
                     context,
                     title: "Kitab Nadhom Imrithi",
-                    subtitle: "Nahwu Nadzam Per-Bait",
+                    subtitle: "Nahwu Nadzam",
                     onTap: () {
 
                       Navigator.push(
@@ -162,7 +162,7 @@ class PilihKitabPage extends StatelessWidget {
               _buildKitabCard(
                 context,
                 title: "Kitab Nadhom Maqsud",
-                subtitle: "Sharaf Nadzam Per-Bait",
+                subtitle: "Shorof Nadzam",
                 onTap: () {
 
                   Navigator.push(
@@ -195,7 +195,7 @@ class PilihKitabPage extends StatelessWidget {
               _buildKitabCard(
                 context,
                 title: "Kitab Alfiyah Ibn Malik",
-                subtitle: "Dalam Pengembangan",
+                subtitle: "Nadzam",
                 onTap: () {
 
                   Navigator.push(
