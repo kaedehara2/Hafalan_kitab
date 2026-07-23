@@ -468,13 +468,14 @@ class _DashboardPageState
                       onTap: () {
 
                         Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>  AbsensiPage(
-                              marhalah: widget.marhalah,
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AbsensiPage(
+                                marhalah: widget.marhalah,
+                                idPembimbing: widget.idPembimbing,
+                              ),
                             ),
-                          )
-                        );
+                          );
 
                       },
                       child: buildInfoCard(
