@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'absensi/absensi_page.dart';
 import 'package:hafalan_kitab/login.dart';
 
 import 'profil.dart';
@@ -463,22 +463,23 @@ class _DashboardPageState
                       width: 12),
 
                   Expanded(
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: () {
 
-                    child:
-                        buildInfoCard(
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AbsensiPage(),
+                          )
+                        );
 
-                      title:
-                          "Pembimbing",
-
-                      value:
-                          namaPembimbing
-                                  .isEmpty
-                              ? widget
-                                  .username
-                              : namaPembimbing,
-
-                      icon:
-                          Icons.person,
+                      },
+                      child: buildInfoCard(
+                        title: "Data Santri",
+                        value: "Absensi",
+                        icon: Icons.calendar_month,
+                      ),
                     ),
                   ),
                 ],
