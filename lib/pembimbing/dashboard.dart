@@ -470,7 +470,9 @@ class _DashboardPageState
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const AbsensiPage(),
+                            builder: (_) =>  AbsensiPage(
+                              marhalah: widget.marhalah,
+                            ),
                           )
                         );
 
