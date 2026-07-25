@@ -48,7 +48,8 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
   };
 
   // ================= DATA BABUL MINAN =================
-  final List<String> bagianBabulMinan = List.generate(35, (index) => "BM ${index + 1}");
+  final List<String> bagianBabulMinan =
+      List.generate(35, (index) => "BM ${index + 1}");
 
   final Map<String, String> keteranganBabulMinan = {
     "BM 1": "Muqadimmah",
@@ -88,8 +89,6 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
     "BM 35": "Khatimah (Penutup)",
   };
 
-  // Struktur checklistData sekarang memisahkan antara Awamil dan Babul Minan
-  // Map<NamaSantri, Map<NamaKitab, Map<Bagian/Bab, Status>>>
   Map<String, Map<String, Map<String, bool>>> checklistData = {};
   bool isLoading = true;
 
@@ -121,12 +120,10 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
           'Babul Minan': {},
         };
 
-        // Inisialisasi awal default false untuk Awamil
         for (var bagian in bagianAwamil) {
           checklistData[nama]!['Awamil']![bagian] = false;
         }
 
-        // Inisialisasi awal default false untuk Babul Minan
         for (var bagian in bagianBabulMinan) {
           checklistData[nama]!['Babul Minan']![bagian] = false;
         }
@@ -155,11 +152,12 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
 
       for (var item in response) {
         String nama = item['nama_santri'];
-        String kitab = item['kitab']; // 'Awamil' atau 'Babul Minan'
+        String kitab = item['kitab'];
         String bagian = item['bagian'];
         bool status = item['status'];
 
-        if (checklistData.containsKey(nama) && checklistData[nama]!.containsKey(kitab)) {
+        if (checklistData.containsKey(nama) &&
+            checklistData[nama]!.containsKey(kitab)) {
           checklistData[nama]![kitab]![bagian] = status;
         }
       }
@@ -209,67 +207,179 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
     }
   }
 
-  // ================= PDF GENERATOR =================
-  Future<void> cetakPDF(String kitab, List<String> listBagian, Map<String, String> ketMap) async {
+  // ================= REVISED & IMPROVED PDF GENERATOR =================
+  Future<void> cetakPDF(
+      String kitab, List<String> listBagian, Map<String, String> ketMap) async {
     final pdf = pw.Document();
+
+    // Penyesuaian ukuran font dinamis tergantung banyaknya kolom
+    final bool isLargeColumn = listBagian.length > 20;
+    final double headerFontSize = isLargeColumn ? 7.0 : 9.0;
+    final double cellFontSize = isLargeColumn ? 6.5 : 8.5;
+    final double ketFontSize = isLargeColumn ? 6.5 : 7.5;
 
     pdf.addPage(
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4.landscape,
+        margin: const pw.EdgeInsets.all(24),
         build: (pw.Context context) {
           return [
-            pw.Text(
-              'Pencapaian Hafalan $kitab',
-              style: pw.TextStyle(
-                fontSize: 18,
-                fontWeight: pw.FontWeight.bold,
-              ),
-            ),
-            pw.SizedBox(height: 20),
-
-            // ================= TABEL PDF =================
-            pw.Table.fromTextArray(
-              cellAlignment: pw.Alignment.center,
-              headerStyle: pw.TextStyle(
-                fontWeight: pw.FontWeight.bold,
-                fontSize: 6, // Diperkecil sedikit agar muat hingga 35 kolom BM
-              ),
-              cellStyle: const pw.TextStyle(
-                fontSize: 6,
-              ),
-              headers: [
-                'Nama',
-                ...listBagian,
+            // Header Dokumen
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
+              children: [
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'LEMBAR VALIDASI PENCAPAIAN HAFALAN',
+                      style: pw.TextStyle(
+                        fontSize: 14,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.SizedBox(height: 2),
+                    pw.Text(
+                      'Kitab: $kitab | ${widget.marhalah}',
+                      style: pw.TextStyle(
+                        fontSize: 11,
+                        color: PdfColors.grey800,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.Text(
+                  'Tanggal Cetak: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                  style: const pw.TextStyle(
+                    fontSize: 9,
+                    color: PdfColors.grey700,
+                  ),
+                ),
               ],
-              data: santriList.map((santri) {
-                String nama = santri['nama_lengkap'];
-                return [
-                  nama,
-                  ...listBagian.map((bagian) {
-                    return checklistData[nama]![kitab]![bagian] == true ? '✓' : '';
-                  }).toList(),
-                ];
-              }).toList(),
             ),
-            pw.SizedBox(height: 20),
+            pw.SizedBox(height: 12),
+            pw.Divider(thickness: 1, color: PdfColors.grey400),
+            pw.SizedBox(height: 10),
 
-            // ================= KETERANGAN PDF =================
+            // Tabel Utama
+            pw.Table(
+              border: pw.TableBorder.all(
+                color: PdfColors.grey600,
+                width: 0.5,
+              ),
+              children: [
+                // Header Tabel
+                pw.TableRow(
+                  decoration: const pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFFE8F5E9), // Hijau Muda Halus
+                  ),
+                  children: [
+                    pw.Container(
+                      padding: const pw.EdgeInsets.symmetric(
+                          vertical: 6, horizontal: 4),
+                      alignment: pw.Alignment.centerLeft,
+                      child: pw.Text(
+                        'Nama Santri',
+                        style: pw.TextStyle(
+                          fontSize: headerFontSize,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    ...listBagian.map((bagian) {
+                      return pw.Container(
+                        padding: const pw.EdgeInsets.symmetric(vertical: 6),
+                        alignment: pw.Alignment.center,
+                        child: pw.Text(
+                          bagian,
+                          style: pw.TextStyle(
+                            fontSize: headerFontSize,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+
+                // Baris Santri
+                ...santriList.map((santri) {
+                  String nama = santri['nama_lengkap'];
+                  return pw.TableRow(
+                    children: [
+                      pw.Container(
+                        padding: const pw.EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 4),
+                        alignment: pw.Alignment.centerLeft,
+                        child: pw.Text(
+                          nama,
+                          style: pw.TextStyle(fontSize: cellFontSize),
+                        ),
+                      ),
+                      ...listBagian.map((bagian) {
+                        bool isChecked =
+                            checklistData[nama]?[kitab]?[bagian] ?? false;
+
+                        return pw.Container(
+                          height: 18,
+                          alignment: pw.Alignment.center,
+                          child: isChecked
+                              ? pw.Text(
+                                  'V', // Gunakan 'V' tebal atau 'X' agar terbaca sempurna tanpa dependensi font
+                                  style: pw.TextStyle(
+                                    fontSize: cellFontSize + 1,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColors.green800,
+                                  ),
+                                )
+                              : pw.Text(''),
+                        );
+                      }),
+                    ],
+                  );
+                }),
+              ],
+            ),
+
+            pw.SizedBox(height: 16),
+
+            // Keterangan Bagian/Bab (Grid Layout Hemat Tempat)
             pw.Text(
-              'Keterangan:',
+              'Keterangan Bagian:',
               style: pw.TextStyle(
+                fontSize: 9,
                 fontWeight: pw.FontWeight.bold,
               ),
             ),
-            pw.SizedBox(height: 8),
+            pw.SizedBox(height: 6),
+
             pw.Wrap(
-              spacing: 10,
+              spacing: 12,
               runSpacing: 4,
               children: ketMap.entries.map((e) {
                 return pw.Container(
-                  width: 180, // Membagi susunan keterangan agar hemat ruang kertas
-                  child: pw.Text(
-                    '${e.key} : ${e.value}',
-                    style: const pw.TextStyle(fontSize: 7),
+                  width: isLargeColumn ? 140 : 180,
+                  child: pw.Row(
+                    mainAxisSize: pw.MainAxisSize.min,
+                    children: [
+                      pw.Text(
+                        '${e.key}: ',
+                        style: pw.TextStyle(
+                          fontSize: ketFontSize,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
+                      pw.Expanded(
+                        child: pw.Text(
+                          e.value,
+                          style: pw.TextStyle(fontSize: ketFontSize),
+                          maxLines: 1,
+                          overflow: pw.TextOverflow.clip,
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }).toList(),
@@ -340,7 +450,8 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
                         value: checklistData[nama]![kitab]![bagian],
                         onChanged: (value) {
                           setState(() {
-                            checklistData[nama]![kitab]![bagian] = value ?? false;
+                            checklistData[nama]![kitab]![bagian] =
+                                value ?? false;
                           });
                         },
                       ),
@@ -351,12 +462,13 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
             );
           }).toList(),
         ),
-      ),
+      ), // <-- Diubah dari sebelumnya '}),' menjadi '), '
     );
   }
 
   // ================= VIEW LAYOUT UNTUK SETIAP TAB =================
-  Widget buildTabContent(String kitab, List<String> listBagian, Map<String, String> ketMap) {
+  Widget buildTabContent(
+      String kitab, List<String> listBagian, Map<String, String> ketMap) {
     return Column(
       children: [
         const SizedBox(height: 10),
@@ -408,7 +520,7 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pencapaian Hafalan Marhalah 1'),
+        title: Text('Pencapaian Hafalan ${widget.marhalah}'),
         backgroundColor: Colors.green,
         bottom: TabBar(
           controller: tabController,
@@ -425,11 +537,9 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
           : TabBarView(
               controller: tabController,
               children: [
-                // ================= TAB AWAMIL =================
                 buildTabContent('Awamil', bagianAwamil, keteranganAwamil),
-
-                // ================= TAB BABUL MINAN =================
-                buildTabContent('Babul Minan', bagianBabulMinan, keteranganBabulMinan),
+                buildTabContent(
+                    'Babul Minan', bagianBabulMinan, keteranganBabulMinan),
               ],
             ),
     );
