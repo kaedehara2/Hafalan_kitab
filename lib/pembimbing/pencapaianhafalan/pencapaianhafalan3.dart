@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 
 class PencapaianHafalan3Page extends StatefulWidget {
@@ -13,139 +13,79 @@ class PencapaianHafalan3Page extends StatefulWidget {
   });
 
   @override
-  State<PencapaianHafalan3Page> createState() =>
-      _PencapaianHafalan3PageState();
+  State<PencapaianHafalan3Page> createState() => _PencapaianHafalan3PageState();
 }
 
-class _PencapaianHafalan3PageState
-    extends State<PencapaianHafalan3Page>
-    with SingleTickerProviderStateMixin {
-
+class _PencapaianHafalan3PageState extends State<PencapaianHafalan3Page> {
   final supabase = Supabase.instance.client;
-
-  late TabController _tabController;
-
   List<Map<String, dynamic>> santriList = [];
 
-  bool isLoading = true;
+  // Nama Kitab untuk Marhalah 3
+  final String namaKitab = "Imriti"; // Ubah sesuai kitab Marhalah 3 jika berbeda
 
-  // ======================================================
-  // IMRITHI
-  // ======================================================
+  // ================= DATA KITAB MARHALAH 3 =================
+  final List<String> bagianKitab = [
+    "IM 1", "IM 2", "IM 3", "IM 4", "IM 5", "IM 6", "IM 7", "IM 8",
+    "IM 9", "IM 10", "IM 11", "IM 12", "IM 13", "IM 14", "IM 15", "IM 16",
+    "IM 17", "IM 18", "IM 19", "IM 20", "IM 21", "IM 22", "IM 23", "IM 24",
+    "IM 25", "IM 26"
+  ];
 
-  final Map<String, String> bagianImrithi = {
-
-    "IM 1": "Muqoddimah",
-    "IM 2": "Bab Al-Kalam",
-    "IM 3": "Bab Al-I'rab",
-    "IM 4": "Bab Ma'rifat Alamatil I'rabi",
+  final Map<String, String> keteranganKitab = {
+    "IM 1": "Muqaddimah",
+    "IM 2": "Bab Al-I'rab",
+    "IM 3": "Bab Al-Alamat",
+    "IM 4": "Bab Al-Ma'rifah wat Nakirah",
     "IM 5": "Bab Al-Af'al",
-    "IM 6": "Bab Al-Mu'rabat",
-    "IM 7": "Bab Al-Nakirah Wal Ma'rifah",
-    "IM 8": "Bab Al-Marfu'at minal Asma'",
-    "IM 9": "Bab Al-Fa'il",
-    "IM 10": "Bab Al-Naib 'an Al-Fa'il",
-    "IM 11": "Bab Al-Mubtada' wal Khabar",
-    "IM 12": "Bab Kana wa Akhwatuha",
-    "IM 13": "Bab Inna wa Akhwatuha",
-    "IM 14": "Bab Dzonna wa Akhwatuha",
-    "IM 15": "Bab Al-Tawabi' (An-Na'ti)",
-    "IM 16": "Bab Al-'Athfi",
-    "IM 17": "Bab Al-Taukid",
-    "IM 18": "Bab Al-Badal",
-    "IM 19": "Bab Al-Manshubat minal Asma'",
-    "IM 20": "Bab Al-Maf'ul bihi",
-    "IM 21": "Bab Al-Mashdar",
-    "IM 22": "Bab Dzhorf Zaman wa Dzhorf Makan",
-    "IM 23": "Bab Al-Hal",
-    "IM 24": "Bab Al-Tamyiz",
-    "IM 25": "Bab Al-Istitsna'",
-    "IM 26": "Bab Al-Laa",
-    "IM 27": "Bab Al-Munada",
-    "IM 28": "Bab Al-Maf'ul li Ajlih",
-    "IM 29": "Bab Al-Maf'ul Ma'ah",
-    "IM 30": "Bab Al-Makhfudhat minal Asma'",
-    "IM 31": "Khotimah",
+    "IM 6": "Bab Al-Marfu'at",
+    "IM 7": "Bab Al-Fa'il",
+    "IM 8": "Bab Na'ibul Fa'il",
+    "IM 9": "Bab Al-Mubtada' wal Khabar",
+    "IM 10": "Bab Kana wa Akhawatuha",
+    "IM 11": "Bab Inna wa Akhawatuha",
+    "IM 12": "Bab Zhanna wa Akhawatuha",
+    "IM 13": "Bab An-Na'at",
+    "IM 14": "Bab Al-'Athaf",
+    "IM 15": "Bab At-Taukid",
+    "IM 16": "Bab Al-Badal",
+    "IM 17": "Bab Al-Manshubat",
+    "IM 18": "Bab Al-Maf'ul Bihi",
+    "IM 19": "Bab Al-Mashdar",
+    "IM 20": "Bab Dzharf az-Zaman wal Makan",
+    "IM 21": "Bab Al-Hal",
+    "IM 22": "Bab At-Tamyiz",
+    "IM 23": "Bab Al-Istisna'",
+    "IM 24": "Bab La",
+    "IM 25": "Bab Al-Munada",
+    "IM 26": "Bab Al-Makhfudhat",
   };
 
-  // ======================================================
-  // MAQSUD
-  // ======================================================
-
-  final Map<String, String> bagianMaqsud = {
-
-    "MQ 1": "Muqoddimah",
-    "MQ 2": "Bab Al-Tsulatsi Al-Mujarrad",
-    "MQ 3": "Bab Al-Tsulatsi Al-Mazid",
-    "MQ 4": "Bab Al-Ruba'i Wal Khumasi",
-    "MQ 5": "Bab Shahih Wal Mudho'af",
-    "MQ 6": "Bab Al-Mu'tal",
-    "MQ 7": "Bab Al-Lafif Wal Mahmuz",
-    "MQ 8": "Bab Tasrif Al-Af'al",
-    "MQ 9": "Bab Al-Amr Wal Nahyi",
-    "MQ 10": "Bab Isim Fai'l Wal Isim Maf'ul",
-    "MQ 11": "Bab Isim Zaman Wal Makan",
-    "MQ 12": "Bab Isim Alah",
-    "MQ 13": "Bab Al-I'lal",
-    "MQ 14": "Khotimah",
-  };
-
-  // ======================================================
-  // CHECKLIST
-  // ======================================================
-
-  Map<String, Map<String, bool>> checklistImrithi = {};
-
-  Map<String, Map<String, bool>> checklistMaqsud = {};
+  Map<String, Map<String, bool>> checklistData = {};
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-
-    _tabController = TabController(
-      length: 2,
-      vsync: this,
-    );
-
     getSantri();
   }
 
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  // ======================================================
-  // GET SANTRI
-  // ======================================================
-
+  // ================= GET SANTRI =================
   Future<void> getSantri() async {
-
     try {
-
       final response = await supabase
           .from('santri')
           .select()
           .eq('marhalah', widget.marhalah)
           .order('nama_lengkap');
 
-      santriList =
-          List<Map<String, dynamic>>.from(response);
+      santriList = List<Map<String, dynamic>>.from(response);
 
       for (var santri in santriList) {
-
         String nama = santri['nama_lengkap'];
+        checklistData[nama] = {};
 
-        checklistImrithi[nama] = {};
-        checklistMaqsud[nama] = {};
-
-        for (var kode in bagianImrithi.keys) {
-          checklistImrithi[nama]![kode] = false;
-        }
-
-        for (var kode in bagianMaqsud.keys) {
-          checklistMaqsud[nama]![kode] = false;
+        for (var bagian in bagianKitab) {
+          checklistData[nama]![bagian] = false;
         }
       }
 
@@ -154,89 +94,47 @@ class _PencapaianHafalan3PageState
       setState(() {
         isLoading = false;
       });
-
     } catch (e) {
-
       debugPrint('Error get santri: $e');
-
       setState(() {
         isLoading = false;
       });
     }
   }
 
-  // ======================================================
-  // LOAD CHECKLIST
-  // ======================================================
-
+  // ================= LOAD CHECKLIST FROM SUPABASE =================
   Future<void> loadChecklist() async {
-
     try {
-
       final response = await supabase
           .from('pencapaian_hafalan')
           .select()
-          .eq('marhalah', widget.marhalah);
+          .eq('marhalah', widget.marhalah)
+          .eq('kitab', namaKitab);
 
       for (var item in response) {
-
         String nama = item['nama_santri'];
-        String kitab = item['kitab'];
         String bagian = item['bagian'];
         bool status = item['status'];
 
-        if (kitab == 'Nadzam Imrithi') {
-
-          if (checklistImrithi.containsKey(nama)) {
-
-            checklistImrithi[nama]![bagian] =
-                status;
-          }
-        }
-
-        if (kitab == 'Nadzam Maqsud') {
-
-          if (checklistMaqsud.containsKey(nama)) {
-
-            checklistMaqsud[nama]![bagian] =
-                status;
-          }
+        if (checklistData.containsKey(nama)) {
+          checklistData[nama]![bagian] = status;
         }
       }
-
     } catch (e) {
-
       debugPrint('Error load checklist: $e');
     }
   }
 
-  // ======================================================
-  // SIMPAN
-  // ======================================================
-
-  Future<void> simpanData({
-
-    required String kitab,
-    required Map<String, Map<String, bool>>
-        checklistData,
-
-  }) async {
-
+  // ================= SIMPAN KE SUPABASE =================
+  Future<void> simpanChecklist() async {
     try {
-
       for (var santri in checklistData.entries) {
-
         String namaSantri = santri.key;
-
         for (var bagian in santri.value.entries) {
-
-          await supabase
-              .from('pencapaian_hafalan')
-              .upsert({
-
+          await supabase.from('pencapaian_hafalan').upsert({
             'nama_santri': namaSantri,
             'marhalah': widget.marhalah,
-            'kitab': kitab,
+            'kitab': namaKitab,
             'bagian': bagian.key,
             'status': bagian.value,
           });
@@ -244,153 +142,203 @@ class _PencapaianHafalan3PageState
       }
 
       if (mounted) {
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'Data $kitab berhasil disimpan',
-            ),
+            content: Text('Data hafalan $namaKitab berhasil disimpan'),
             backgroundColor: Colors.green,
           ),
         );
       }
-
     } catch (e) {
-
-      debugPrint('Error simpan: $e');
+      debugPrint('Error simpan checklist: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Gagal menyimpan data: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
-  // ======================================================
-  // CETAK PDF
-  // ======================================================
-
-  Future<void> cetakPDF({
-
-    required String judul,
-    required String kitab,
-    required Map<String, String> bagianMap,
-    required Map<String, Map<String, bool>>
-        checklistData,
-
-  }) async {
-
+  // ================= REVISED & IMPROVED PDF GENERATOR =================
+  Future<void> cetakPDF() async {
     final pdf = pw.Document();
 
+    // Memuat font khusus pendukung karakter Tai Viet "ꪜ"
+    final fontTaiViet = await PdfGoogleFonts.notoSansTaiVietRegular();
+
+    final bool isLargeColumn = bagianKitab.length > 20;
+    final double headerFontSize = isLargeColumn ? 7.0 : 9.0;
+    final double cellFontSize = isLargeColumn ? 6.5 : 8.5;
+    final double ketFontSize = isLargeColumn ? 6.5 : 7.5;
+
     pdf.addPage(
-
       pw.MultiPage(
-
-        pageFormat:
-            PdfPageFormat.a3.landscape,
-
-        build: (context) {
-
+        pageFormat: PdfPageFormat.a4.landscape,
+        margin: const pw.EdgeInsets.all(24),
+        build: (pw.Context context) {
           return [
-
-            pw.Text(
-
-              judul,
-
-              style: pw.TextStyle(
-                fontSize: 20,
-                fontWeight:
-                    pw.FontWeight.bold,
-              ),
-            ),
-
-            pw.SizedBox(height: 20),
-
-            // ==========================================
-            // TABEL
-            // ==========================================
-
-            pw.Table.fromTextArray(
-
-              cellAlignment:
-                  pw.Alignment.center,
-
-              headerStyle: pw.TextStyle(
-                fontWeight:
-                    pw.FontWeight.bold,
-                fontSize: 9,
-              ),
-
-              cellStyle: const pw.TextStyle(
-                fontSize: 8,
-              ),
-
-              headers: [
-
-                'Nama',
-
-                ...bagianMap.keys,
+            // Header Dokumen
+            pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
+              children: [
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'LEMBAR VALIDASI PENCAPAIAN HAFALAN',
+                      style: pw.TextStyle(
+                        fontSize: 14,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.SizedBox(height: 2),
+                    pw.Text(
+                      'Kitab: $namaKitab | ${widget.marhalah}',
+                      style: pw.TextStyle(
+                        fontSize: 11,
+                        color: PdfColors.grey800,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.Text(
+                  'Tanggal Cetak: ${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+                  style: const pw.TextStyle(
+                    fontSize: 9,
+                    color: PdfColors.grey700,
+                  ),
+                ),
               ],
-
-              data: santriList.map((santri) {
-
-                String nama =
-                    santri['nama_lengkap'];
-
-                return [
-
-                  nama,
-
-                  ...bagianMap.keys.map((kode) {
-
-                    return checklistData[nama]![kode] ==
-                            true
-                        ? '✓'
-                        : '';
-
-                  }).toList(),
-                ];
-
-              }).toList(),
             ),
-
-            pw.SizedBox(height: 20),
-
-            // ==========================================
-            // KETERANGAN
-            // ==========================================
-
-            pw.Text(
-
-              'Keterangan Singkatan',
-
-              style: pw.TextStyle(
-                fontWeight:
-                    pw.FontWeight.bold,
-                fontSize: 14,
-              ),
-            ),
-
+            pw.SizedBox(height: 12),
+            pw.Divider(thickness: 1, color: PdfColors.grey400),
             pw.SizedBox(height: 10),
 
-            ...bagianMap.entries.map(
-
-              (e) {
-
-                return pw.Padding(
-
-                  padding:
-                      const pw.EdgeInsets.only(
-                    bottom: 3,
+            // Tabel Utama
+            pw.Table(
+              border: pw.TableBorder.all(
+                color: PdfColors.grey600,
+                width: 0.5,
+              ),
+              children: [
+                // Header Tabel
+                pw.TableRow(
+                  decoration: const pw.BoxDecoration(
+                    color: PdfColor.fromInt(0xFFE8F5E9), // Hijau Muda Halus
                   ),
-
-                  child: pw.Text(
-
-                    '${e.key} : ${e.value}',
-
-                    style: const pw.TextStyle(
-                      fontSize: 10,
+                  children: [
+                    pw.Container(
+                      padding: const pw.EdgeInsets.symmetric(
+                          vertical: 6, horizontal: 4),
+                      alignment: pw.Alignment.centerLeft,
+                      child: pw.Text(
+                        'Nama Santri',
+                        style: pw.TextStyle(
+                          fontSize: headerFontSize,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
                     ),
+                    ...bagianKitab.map((bagian) {
+                      return pw.Container(
+                        padding: const pw.EdgeInsets.symmetric(vertical: 6),
+                        alignment: pw.Alignment.center,
+                        child: pw.Text(
+                          bagian,
+                          style: pw.TextStyle(
+                            fontSize: headerFontSize,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+
+                // Baris Santri
+                ...santriList.map((santri) {
+                  String nama = santri['nama_lengkap'];
+                  return pw.TableRow(
+                    children: [
+                      pw.Container(
+                        padding: const pw.EdgeInsets.symmetric(
+                            vertical: 4, horizontal: 4),
+                        alignment: pw.Alignment.centerLeft,
+                        child: pw.Text(
+                          nama,
+                          style: pw.TextStyle(fontSize: cellFontSize),
+                        ),
+                      ),
+                      ...bagianKitab.map((bagian) {
+                        bool isChecked = checklistData[nama]?[bagian] ?? false;
+
+                        return pw.Container(
+                          height: 18,
+                          alignment: pw.Alignment.center,
+                          child: isChecked
+                              ? pw.Text(
+                                  'ꪜ', // Menggunakan simbol emoji ꪜ
+                                  style: pw.TextStyle(
+                                    font: fontTaiViet,
+                                    fontSize: cellFontSize + 2,
+                                    fontWeight: pw.FontWeight.bold,
+                                    color: PdfColors.green800,
+                                  ),
+                                )
+                              : pw.Text(''),
+                        );
+                      }),
+                    ],
+                  );
+                }),
+              ],
+            ),
+
+            pw.SizedBox(height: 16),
+
+            // Keterangan Bagian/Bab (Grid Layout Hemat Tempat)
+            pw.Text(
+              'Keterangan Bagian:',
+              style: pw.TextStyle(
+                fontSize: 9,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            pw.SizedBox(height: 6),
+
+            pw.Wrap(
+              spacing: 12,
+              runSpacing: 4,
+              children: keteranganKitab.entries.map((e) {
+                return pw.Container(
+                  width: isLargeColumn ? 140 : 180,
+                  child: pw.Row(
+                    mainAxisSize: pw.MainAxisSize.min,
+                    children: [
+                      pw.Text(
+                        '${e.key}: ',
+                        style: pw.TextStyle(
+                          fontSize: ketFontSize,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
+                      pw.Expanded(
+                        child: pw.Text(
+                          e.value,
+                          style: pw.TextStyle(fontSize: ketFontSize),
+                          maxLines: 1,
+                          overflow: pw.TextOverflow.clip,
+                        ),
+                      ),
+                    ],
                   ),
                 );
-              },
+              }).toList(),
             ),
           ];
         },
@@ -398,507 +346,134 @@ class _PencapaianHafalan3PageState
     );
 
     await Printing.layoutPdf(
-
-      onLayout: (format) async =>
-          pdf.save(),
+      onLayout: (format) async => pdf.save(),
     );
   }
 
-  // ======================================================
-  // BUILD TABLE
-  // ======================================================
-
-  Widget buildTable({
-
-    required Map<String, String> bagianMap,
-
-    required Map<String, Map<String, bool>>
-        checklistData,
-
-  }) {
-
+  // ================= REUSABLE DATA TABLE WIDGET =================
+  Widget buildTable() {
     return SingleChildScrollView(
-
       scrollDirection: Axis.horizontal,
-
-      child: DataTable(
-
-        border: TableBorder.all(
-          color: Colors.black12,
-        ),
-
-        headingRowColor:
-            MaterialStateProperty.all(
-          Colors.green.shade100,
-        ),
-
-        columns: [
-
-          const DataColumn(
-
-            label: SizedBox(
-
-              width: 150,
-
-              child: Text(
-
-                'Nama Santri',
-
-                style: TextStyle(
-                  fontWeight:
-                      FontWeight.bold,
-                ),
-              ),
-            ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: DataTable(
+          border: TableBorder.all(
+            color: Colors.black12,
           ),
-
-          ...bagianMap.keys.map(
-
-            (kode) => DataColumn(
-
+          headingRowColor: WidgetStateProperty.all(
+            Colors.green[100],
+          ),
+          columns: [
+            const DataColumn(
               label: SizedBox(
-
-                width: 70,
-
+                width: 140,
                 child: Text(
-
-                  kode,
-
-                  textAlign:
-                      TextAlign.center,
-
-                  style: const TextStyle(
-
-                    fontWeight:
-                        FontWeight.bold,
-
-                    fontSize: 11,
-                  ),
+                  'Nama Santri',
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-          ),
-        ],
-
-        rows: santriList.map((santri) {
-
-          String nama =
-              santri['nama_lengkap'];
-
-          return DataRow(
-
-            cells: [
-
-              DataCell(
-
-                SizedBox(
-
-                  width: 150,
-
-                  child: Text(nama),
-                ),
-              ),
-
-              ...bagianMap.keys.map(
-
-                (kode) => DataCell(
-
-                  Checkbox(
-
-                    value:
-                        checklistData[nama]![kode],
-
-                    onChanged: (value) {
-
-                      setState(() {
-
-                        checklistData[nama]![kode] =
-                            value ?? false;
-                      });
-                    },
-                  ),
-                ),
-              ),
-            ],
-          );
-
-        }).toList(),
-      ),
-    );
-  }
-
-  // ======================================================
-  // BUILD KETERANGAN
-  // ======================================================
-
- Widget buildKeterangan(
-  Map<String, String> bagianMap,
-) {
-  return Container(
-    margin: const EdgeInsets.all(12),
-
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-    ),
-
-    child: ExpansionTile(
-      initiallyExpanded: false,
-
-      title: const Text(
-        'Keterangan Singkatan',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
-      ),
-
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16),
-
-          child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-
-            children: bagianMap.entries.map(
-              (e) {
-                return Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    bottom: 8,
-                  ),
-
+            ...bagianKitab.map(
+              (bagian) => DataColumn(
+                label: SizedBox(
+                  width: 55,
                   child: Text(
-                    '${e.key} : ${e.value}',
+                    bagian,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
                     ),
                   ),
-                );
-              },
-            ).toList(),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-  // ======================================================
-  // BUILD
-  // ======================================================
-
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-
-      appBar: AppBar(
-
-        title: const Text(
-          'Pencapaian Hafalan Marhalah 3',
-        ),
-
-        backgroundColor: Colors.green,
-
-        bottom: TabBar(
-
-          controller: _tabController,
-
-          tabs: const [
-
-            Tab(
-              text: 'Nadzam Imrithi',
-            ),
-
-            Tab(
-              text: 'Nadzam Maqsud',
+                ),
+              ),
             ),
           ],
+          rows: santriList.map((santri) {
+            String nama = santri['nama_lengkap'];
+            return DataRow(
+              cells: [
+                DataCell(
+                  SizedBox(
+                    width: 140,
+                    child: Text(nama),
+                  ),
+                ),
+                ...bagianKitab.map(
+                  (bagian) => DataCell(
+                    Center(
+                      child: Checkbox(
+                        value: checklistData[nama]![bagian],
+                        onChanged: (value) {
+                          setState(() {
+                            checklistData[nama]![bagian] = value ?? false;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }).toList(),
         ),
       ),
+    );
+  }
 
+  // ================= CORE UI build =================
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Pencapaian Hafalan ${widget.marhalah}'),
+        backgroundColor: Colors.green,
+      ),
       body: isLoading
-
           ? const Center(
-              child:
-                  CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
             )
-
-          : TabBarView(
-
-              controller: _tabController,
-
+          : Column(
               children: [
-
-                // ======================================
-                // TAB IMRITHI
-                // ======================================
-
-                Column(
-
-                  children: [
-
-                    const SizedBox(height: 10),
-
-                    Padding(
-
-                      padding:
-                          const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
-
-                      child: Row(
-
-                        children: [
-
-                          Expanded(
-
-                            child:
-                                ElevatedButton.icon(
-
-                              onPressed: () {
-
-                                simpanData(
-
-                                  kitab:
-                                      'Nadzam Imrithi',
-
-                                  checklistData:
-                                      checklistImrithi,
-                                );
-                              },
-
-                              icon:
-                                  const Icon(Icons.save),
-
-                              label:
-                                  const Text('Simpan'),
-
-                              style:
-                                  ElevatedButton.styleFrom(
-
-                                backgroundColor:
-                                    Colors.green,
-
-                                foregroundColor:
-                                    Colors.white,
-                              ),
-                            ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: simpanChecklist,
+                          icon: const Icon(Icons.save),
+                          label: const Text('Simpan'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-
-                          const SizedBox(width: 10),
-
-                          Expanded(
-
-                            child:
-                                ElevatedButton.icon(
-
-                              onPressed: () {
-
-                                cetakPDF(
-
-                                  judul:
-                                      'Pencapaian Hafalan Nadzam Imrithi',
-
-                                  kitab:
-                                      'Nadzam Imrithi',
-
-                                  bagianMap:
-                                      bagianImrithi,
-
-                                  checklistData:
-                                      checklistImrithi,
-                                );
-                              },
-
-                              icon: const Icon(
-                                Icons.picture_as_pdf,
-                              ),
-
-                              label:
-                                  const Text('Cetak PDF'),
-
-                              style:
-                                  ElevatedButton.styleFrom(
-
-                                backgroundColor:
-                                    Colors.red,
-
-                                foregroundColor:
-                                    Colors.white,
-                              ),
-                            ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: cetakPDF,
+                          icon: const Icon(Icons.picture_as_pdf),
+                          label: const Text('Cetak PDF'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                              Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-
-                    Padding(
-                      padding:
-                          const EdgeInsets.all(12),
-
-                      child: buildTable(
-                        bagianMap:
-                            bagianImrithi,
-
-                        checklistData:
-                            checklistImrithi,
-                      ),
-                    ),
-
-                    buildKeterangan(
-                      bagianImrithi,
-                    ),
-
-                    const SizedBox(height: 20),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ),
-                  ],
-                ),
-
-                // ======================================
-                // TAB MAQSUD
-                // ======================================
-
-                Column(
-
-                  children: [
-
-                    const SizedBox(height: 10),
-
-                    Padding(
-
-                      padding:
-                          const EdgeInsets.symmetric(
-                        horizontal: 16,
-                      ),
-
-                      child: Row(
-
-                        children: [
-
-                          Expanded(
-
-                            child:
-                                ElevatedButton.icon(
-
-                              onPressed: () {
-
-                                simpanData(
-
-                                  kitab:
-                                      'Nadzam Maqsud',
-
-                                  checklistData:
-                                      checklistMaqsud,
-                                );
-                              },
-
-                              icon:
-                                  const Icon(Icons.save),
-
-                              label:
-                                  const Text('Simpan'),
-
-                              style:
-                                  ElevatedButton.styleFrom(
-
-                                backgroundColor:
-                                    Colors.green,
-
-                                foregroundColor:
-                                    Colors.white,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(width: 10),
-
-                          Expanded(
-
-                            child:
-                                ElevatedButton.icon(
-
-                              onPressed: () {
-
-                                cetakPDF(
-
-                                  judul:
-                                      'Pencapaian Hafalan Nadzam Maqsud',
-
-                                  kitab:
-                                      'Nadzam Maqsud',
-
-                                  bagianMap:
-                                      bagianMaqsud,
-
-                                  checklistData:
-                                      checklistMaqsud,
-                                );
-                              },
-
-                              icon: const Icon(
-                                Icons.picture_as_pdf,
-                              ),
-
-                              label:
-                                  const Text('Cetak PDF'),
-
-                              style:
-                                  ElevatedButton.styleFrom(
-
-                                backgroundColor:
-                                    Colors.red,
-
-                                foregroundColor:
-                                    Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-
-                          Padding(
-                            padding:
-                                const EdgeInsets.all(12),
-
-                            child: buildTable(
-                              bagianMap:
-                                  bagianMaqsud,
-
-                              checklistData:
-                                  checklistMaqsud,
-                            ),
-                          ),
-
-                          buildKeterangan(
-                            bagianMaqsud,
-                          ),
-
-                          const SizedBox(height: 20),
-                        ],
-                      ),
-                    ),
-),
-                  ],
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: buildTable(),
+                  ),
                 ),
               ],
             ),

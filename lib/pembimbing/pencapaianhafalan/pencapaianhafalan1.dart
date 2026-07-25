@@ -16,89 +16,55 @@ class PencapaianHafalan1Page extends StatefulWidget {
   State<PencapaianHafalan1Page> createState() => _PencapaianHafalan1PageState();
 }
 
-class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
-    with SingleTickerProviderStateMixin {
+class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page> {
   final supabase = Supabase.instance.client;
-  late TabController tabController;
   List<Map<String, dynamic>> santriList = [];
 
-  // ================= DATA AWAMIL =================
-  final List<String> bagianAwamil = [
-    "AM 1", "AM 2", "AM 3", "AM 4", "AM 5", "AM 6", "AM 7", "AM 8",
-    "AM 9", "AM 10", "AM 11", "AM 12", "AM 13", "AM 14", "AM 15", "AM 16",
+  // ================= DATA AQIDATUL AWAM =================
+  final List<String> bagianAqidatulAwam = [
+    "AQ 1", "AQ 2", "AQ 3", "AQ 4", "AQ 5", "AQ 6", "AQ 7", "AQ 8",
+    "AQ 9", "AQ 10", "AQ 11", "AQ 12", "AQ 13", "AQ 14", "AQ 15", "AQ 16",
+    "AQ 17", "AQ 18", "AQ 19", "AQ 20", "AQ 21", "AQ 22", "AQ 23", "AQ 24",
+    "AQ 25", "AQ 26", "AQ 27", "AQ 28"
   ];
 
-  final Map<String, String> keteranganAwamil = {
-    "AM 1": "Muqadimmah",
-    "AM 2": "Warna ke 1",
-    "AM 3": "Warna ke 2",
-    "AM 4": "Warna ke 3",
-    "AM 5": "Warna ke 4",
-    "AM 6": "Warna ke 5",
-    "AM 7": "Warna ke 6",
-    "AM 8": "Warna ke 7",
-    "AM 9": "Warna ke 8",
-    "AM 10": "Warna ke 9",
-    "AM 11": "Warna ke 10",
-    "AM 12": "Warna ke 11",
-    "AM 13": "Warna ke 12",
-    "AM 14": "Warna ke 13",
-    "AM 15": "Qiyâsi",
-    "AM 16": "Ma'nawi",
+  final Map<String, String> keteranganAqidatulAwam = {
+    "AQ 1": "Bait 1 - 2 (Basmalah & Hamdalah)",
+    "AQ 2": "Bait 3 - 4 (Shalawat & Salam)",
+    "AQ 3": "Bait 5 - 6 (Sifat Wajib Allah)",
+    "AQ 4": "Bait 7 - 8 (Sifat Mustahil & Jaiz)",
+    "AQ 5": "Bait 9 - 10 (Sifat Rasulullah)",
+    "AQ 6": "Bait 11 - 12 (Sifat Wajib & Jaiz Rasul)",
+    "AQ 7": "Bait 13 - 14 (Nama-nama Rasul)",
+    "AQ 8": "Bait 15 - 16 (Nama Rasul Lanjutan)",
+    "AQ 9": "Bait 17 - 18 (Malaikat & Tugasnya)",
+    "AQ 10": "Bait 19 - 20 (Kitab-kitab Allah)",
+    "AQ 11": "Bait 21 - 22 (Sahabat & Keluarga Nabi)",
+    "AQ 12": "Bait 23 - 24 (Putra-Putri Nabi)",
+    "AQ 13": "Bait 25 - 26 (Nasab Nabi)",
+    "AQ 14": "Bait 27 - 28 (Istri-istri Nabi)",
+    "AQ 15": "Bait 29 - 30 (Paman & Bibi Nabi)",
+    "AQ 16": "Bait 31 - 32 (Isra' Mi'raj)",
+    "AQ 17": "Bait 33 - 34 (Kewajiban Shalat)",
+    "AQ 18": "Bait 35 - 36 (Penutup & Doa)",
+    "AQ 19": "Bait 37 - 38 (Lanjutan Penutup)",
+    "AQ 20": "Bait 39 - 40 (Selesai Penutup)",
+    "AQ 21": "Bait 41 - 42 (Tambahan Bait)",
+    "AQ 22": "Bait 43 - 44 (Tambahan Bait)",
+    "AQ 23": "Bait 45 - 46 (Tambahan Bait)",
+    "AQ 24": "Bait 47 - 48 (Tambahan Bait)",
+    "AQ 25": "Bait 49 - 50 (Tambahan Bait)",
+    "AQ 26": "Bait 51 - 52 (Tambahan Bait)",
+    "AQ 27": "Bait 53 - 54 (Tambahan Bait)",
+    "AQ 28": "Bait 55 - 57 (Khatam Nadhom)",
   };
 
-  // ================= DATA BABUL MINAN =================
-  final List<String> bagianBabulMinan =
-      List.generate(35, (index) => "BM ${index + 1}");
-
-  final Map<String, String> keteranganBabulMinan = {
-    "BM 1": "Muqadimmah",
-    "BM 2": "Pasal : Adapun artinya islam",
-    "BM 3": "Pasal : Adapun yang dikata orang islam",
-    "BM 4": "Pasal : Adapun artinya islam",
-    "BM 5": "Pasal : Adapun artinya iman",
-    "BM 6": "Pasal : Adapun artinya (Lafadz Tauhid)",
-    "BM 7": "Pasal : Adapun rukun istinja",
-    "BM 8": "Pasal : Adapun rukun air sembahyang",
-    "BM 9": "Pasal : Adapun jikalau dapat hadast besar",
-    "BM 10": "Pasal : Adapun syarat air sembahyang",
-    "BM 11": "Pasal : Adapun yang membatalkan air sembahyang",
-    "BM 12": "Pasal : Adapun apabila batal air sembahyang",
-    "BM 13": "Pasal : Adapun jika dapat hadast besar",
-    "BM 14": "Pasal : Adapun barang yang najis",
-    "BM 15": "Pasal : Adapun membasuh najis",
-    "BM 16": "Pasal : Adapun lain najis",
-    "BM 17": "Pasal : Adapun sekurang-kurangnya haid",
-    "BM 18": "Pasal : Adapun sekurang-kurangnya nifas",
-    "BM 19": "Pasal : Adapun jikalau perempuan haid",
-    "BM 20": "Pasal : Adapun sembahyang lima waktu",
-    "BM 21": "Pasal : Adapun syarat sembahyang",
-    "BM 22": "Pasal : Adapun rukun sembahyang",
-    "BM 23": "Pasal : Adapun sembahyang jum'at",
-    "BM 24": "Pasal : Adapun syaratnya diwaktu zuhur",
-    "BM 25": "Pasal : Adapun sembahyang jenazah",
-    "BM 26": "Pasal : Adapun zakat itu wajib",
-    "BM 27": "Pasal : Adapun qadar zakat",
-    "BM 28": "Pasal : Adapun zakat fitrah",
-    "BM 29": "Pasal : Adapun itu zakat emas atau perak",
-    "BM 30": "Pasal : Adapun puasa ramadan",
-    "BM 31": "Pasal : Adapun syaratnya pula",
-    "BM 32": "Pasal : Adapun pergi haji",
-    "BM 33": "Pasal : Adapun pencaharian kehidupan",
-    "BM 34": "Pasal : Adapun pertigahan syarah",
-    "BM 35": "Khatimah (Penutup)",
-  };
-
-  Map<String, Map<String, Map<String, bool>>> checklistData = {};
+  Map<String, Map<String, bool>> checklistData = {};
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(
-      length: 2,
-      vsync: this,
-    );
     getSantri();
   }
 
@@ -115,17 +81,10 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
 
       for (var santri in santriList) {
         String nama = santri['nama_lengkap'];
-        checklistData[nama] = {
-          'Awamil': {},
-          'Babul Minan': {},
-        };
+        checklistData[nama] = {};
 
-        for (var bagian in bagianAwamil) {
-          checklistData[nama]!['Awamil']![bagian] = false;
-        }
-
-        for (var bagian in bagianBabulMinan) {
-          checklistData[nama]!['Babul Minan']![bagian] = false;
+        for (var bagian in bagianAqidatulAwam) {
+          checklistData[nama]![bagian] = false;
         }
       }
 
@@ -148,17 +107,16 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
       final response = await supabase
           .from('pencapaian_hafalan')
           .select()
-          .eq('marhalah', widget.marhalah);
+          .eq('marhalah', widget.marhalah)
+          .eq('kitab', 'Aqidatul Awam');
 
       for (var item in response) {
         String nama = item['nama_santri'];
-        String kitab = item['kitab'];
         String bagian = item['bagian'];
         bool status = item['status'];
 
-        if (checklistData.containsKey(nama) &&
-            checklistData[nama]!.containsKey(kitab)) {
-          checklistData[nama]![kitab]![bagian] = status;
+        if (checklistData.containsKey(nama)) {
+          checklistData[nama]![bagian] = status;
         }
       }
     } catch (e) {
@@ -167,35 +125,31 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
   }
 
   // ================= SIMPAN KE SUPABASE =================
-  Future<void> simpanChecklist(String kitab) async {
+  Future<void> simpanChecklist() async {
     try {
       for (var santri in checklistData.entries) {
         String namaSantri = santri.key;
-        var dataKitab = santri.value[kitab];
-
-        if (dataKitab != null) {
-          for (var bagian in dataKitab.entries) {
-            await supabase.from('pencapaian_hafalan').upsert({
-              'nama_santri': namaSantri,
-              'marhalah': widget.marhalah,
-              'kitab': kitab,
-              'bagian': bagian.key,
-              'status': bagian.value,
-            });
-          }
+        for (var bagian in santri.value.entries) {
+          await supabase.from('pencapaian_hafalan').upsert({
+            'nama_santri': namaSantri,
+            'marhalah': widget.marhalah,
+            'kitab': 'Aqidatul Awam',
+            'bagian': bagian.key,
+            'status': bagian.value,
+          });
         }
       }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Data hafalan $kitab berhasil disimpan'),
+          const SnackBar(
+            content: Text('Data hafalan Aqidatul Awam berhasil disimpan'),
             backgroundColor: Colors.green,
           ),
         );
       }
     } catch (e) {
-      debugPrint('Error simpan checklist $kitab: $e');
+      debugPrint('Error simpan checklist: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -208,12 +162,13 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
   }
 
   // ================= REVISED & IMPROVED PDF GENERATOR =================
-  Future<void> cetakPDF(
-      String kitab, List<String> listBagian, Map<String, String> ketMap) async {
+  Future<void> cetakPDF() async {
     final pdf = pw.Document();
 
-    // Penyesuaian ukuran font dinamis tergantung banyaknya kolom
-    final bool isLargeColumn = listBagian.length > 20;
+    // Memuat font khusus pendukung karakter Tai Viet "ꪜ"
+    final fontTaiViet = await PdfGoogleFonts.notoSansTaiVietRegular();
+
+    final bool isLargeColumn = bagianAqidatulAwam.length > 20;
     final double headerFontSize = isLargeColumn ? 7.0 : 9.0;
     final double cellFontSize = isLargeColumn ? 6.5 : 8.5;
     final double ketFontSize = isLargeColumn ? 6.5 : 7.5;
@@ -241,7 +196,7 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
                     ),
                     pw.SizedBox(height: 2),
                     pw.Text(
-                      'Kitab: $kitab | ${widget.marhalah}',
+                      'Kitab: Aqidatul Awam | ${widget.marhalah}',
                       style: pw.TextStyle(
                         fontSize: 11,
                         color: PdfColors.grey800,
@@ -288,7 +243,7 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
                         ),
                       ),
                     ),
-                    ...listBagian.map((bagian) {
+                    ...bagianAqidatulAwam.map((bagian) {
                       return pw.Container(
                         padding: const pw.EdgeInsets.symmetric(vertical: 6),
                         alignment: pw.Alignment.center,
@@ -318,18 +273,18 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
                           style: pw.TextStyle(fontSize: cellFontSize),
                         ),
                       ),
-                      ...listBagian.map((bagian) {
-                        bool isChecked =
-                            checklistData[nama]?[kitab]?[bagian] ?? false;
+                      ...bagianAqidatulAwam.map((bagian) {
+                        bool isChecked = checklistData[nama]?[bagian] ?? false;
 
                         return pw.Container(
                           height: 18,
                           alignment: pw.Alignment.center,
                           child: isChecked
                               ? pw.Text(
-                                  'V', // Gunakan 'V' tebal atau 'X' agar terbaca sempurna tanpa dependensi font
+                                  'ꪜ', // Menggunakan simbol emoji ꪜ
                                   style: pw.TextStyle(
-                                    fontSize: cellFontSize + 1,
+                                    font: fontTaiViet,
+                                    fontSize: cellFontSize + 2,
                                     fontWeight: pw.FontWeight.bold,
                                     color: PdfColors.green800,
                                   ),
@@ -345,7 +300,7 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
 
             pw.SizedBox(height: 16),
 
-            // Keterangan Bagian/Bab (Grid Layout Hemat Tempat)
+            // Keterangan Bagian/Bait (Grid Layout Hemat Tempat)
             pw.Text(
               'Keterangan Bagian:',
               style: pw.TextStyle(
@@ -358,7 +313,7 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
             pw.Wrap(
               spacing: 12,
               runSpacing: 4,
-              children: ketMap.entries.map((e) {
+              children: keteranganAqidatulAwam.entries.map((e) {
                 return pw.Container(
                   width: isLargeColumn ? 140 : 180,
                   child: pw.Row(
@@ -395,7 +350,7 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
   }
 
   // ================= REUSABLE DATA TABLE WIDGET =================
-  Widget buildTable(String kitab, List<String> listBagian) {
+  Widget buildTable() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SingleChildScrollView(
@@ -417,7 +372,7 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
                 ),
               ),
             ),
-            ...listBagian.map(
+            ...bagianAqidatulAwam.map(
               (bagian) => DataColumn(
                 label: SizedBox(
                   width: 55,
@@ -443,15 +398,14 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
                     child: Text(nama),
                   ),
                 ),
-                ...listBagian.map(
+                ...bagianAqidatulAwam.map(
                   (bagian) => DataCell(
                     Center(
                       child: Checkbox(
-                        value: checklistData[nama]![kitab]![bagian],
+                        value: checklistData[nama]![bagian],
                         onChanged: (value) {
                           setState(() {
-                            checklistData[nama]![kitab]![bagian] =
-                                value ?? false;
+                            checklistData[nama]![bagian] = value ?? false;
                           });
                         },
                       ),
@@ -462,56 +416,7 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
             );
           }).toList(),
         ),
-      ), // <-- Diubah dari sebelumnya '}),' menjadi '), '
-    );
-  }
-
-  // ================= VIEW LAYOUT UNTUK SETIAP TAB =================
-  Widget buildTabContent(
-      String kitab, List<String> listBagian, Map<String, String> ketMap) {
-    return Column(
-      children: [
-        const SizedBox(height: 10),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            children: [
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => simpanChecklist(kitab),
-                  icon: const Icon(Icons.save),
-                  label: const Text('Simpan'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ElevatedButton.icon(
-                  onPressed: () => cetakPDF(kitab, listBagian, ketMap),
-                  icon: const Icon(Icons.picture_as_pdf),
-                  label: const Text('Cetak PDF'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: buildTable(kitab, listBagian),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -522,24 +427,53 @@ class _PencapaianHafalan1PageState extends State<PencapaianHafalan1Page>
       appBar: AppBar(
         title: Text('Pencapaian Hafalan ${widget.marhalah}'),
         backgroundColor: Colors.green,
-        bottom: TabBar(
-          controller: tabController,
-          tabs: const [
-            Tab(text: 'Awamil'),
-            Tab(text: 'Babul Minan'),
-          ],
-        ),
       ),
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : TabBarView(
-              controller: tabController,
+          : Column(
               children: [
-                buildTabContent('Awamil', bagianAwamil, keteranganAwamil),
-                buildTabContent(
-                    'Babul Minan', bagianBabulMinan, keteranganBabulMinan),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: simpanChecklist,
+                          icon: const Icon(Icons.save),
+                          label: const Text('Simpan'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: cetakPDF,
+                          icon: const Icon(Icons.picture_as_pdf),
+                          label: const Text('Cetak PDF'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: buildTable(),
+                  ),
+                ),
               ],
             ),
     );
